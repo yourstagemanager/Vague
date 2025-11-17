@@ -855,6 +855,17 @@ function Chat() {
               </button>
             </form>
           )}
+
+          {/* Show Scantron keyboard inline when in Scantron theme */}
+          {isScantron && (
+            <div style={{ marginTop: '20px' }}>
+              <ScantronKeyboard
+                onSubmit={handleScantronKeyboardSubmit}
+                inline={true}
+              />
+            </div>
+          )}
+
           {inputValue.length > SBEMAIL_THRESHOLD && !isStrongBad && (
             <div style={{
               fontSize: '10px',
