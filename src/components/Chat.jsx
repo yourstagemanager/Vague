@@ -13,11 +13,53 @@ import '../styles/earlymac.css';
 // Easter egg threshold - messages longer than this trigger Strong Bad email mode
 const SBEMAIL_THRESHOLD = 150;
 
+/**
+ * DEVELOPER BACKDOOR: Theme Testing URLs
+ *
+ * Use these URLs to navigate directly to specific themes for testing:
+ * - http://localhost:5150/?theme=lazy       - Lazy Assistant (default)
+ * - http://localhost:5150/?theme=strongbad  - Strong Bad / Compy 386
+ * - http://localhost:5150/?theme=eager      - Eager Assistant (with gaslighting)
+ * - http://localhost:5150/?theme=scantron   - Scantron Test Form
+ * - http://localhost:5150/?theme=mapquest   - MapQuest Navigation
+ * - http://localhost:5150/?theme=myspace    - MySpace Profile
+ * - http://localhost:5150/?theme=geocities  - GeoCities Website
+ * - http://localhost:5150/?theme=mac        - Early Mac System 7
+ */
+
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState(THEMES.LAZY_ASSISTANT);
+  const [currentTheme, setCurrentTheme] = useState(() => {
+    // Check for theme parameter in URL for testing
+    const params = new URLSearchParams(window.location.search);
+    const themeParam = params.get('theme');
+
+    const themeMap = {
+      'lazy': THEMES.LAZY_ASSISTANT,
+      'strongbad': THEMES.STRONG_BAD,
+      'eager': THEMES.EAGER_ASSISTANT,
+      'scantron': THEMES.SCANTRON,
+      'mapquest': THEMES.MAPQUEST,
+      'myspace': THEMES.MYSPACE,
+      'geocities': THEMES.GEOCITIES,
+      'mac': THEMES.EARLY_MAC
+    };
+
+    const selectedTheme = themeMap[themeParam?.toLowerCase()] || THEMES.LAZY_ASSISTANT;
+
+    // Log theme info for developer
+    if (themeParam) {
+      console.log(`%c🎨 THEME BACKDOOR ACTIVATED`, 'color: #ff6600; font-size: 16px; font-weight: bold');
+      console.log(`%cLoaded theme: ${themeParam}`, 'color: #0066cc; font-size: 14px');
+    } else {
+      console.log(`%c🎨 Theme Testing Available`, 'color: #666; font-size: 12px');
+      console.log(`%cAdd ?theme=<name> to URL. Options: lazy, strongbad, eager, scantron, mapquest, myspace, geocities, mac`, 'color: #999; font-size: 11px');
+    }
+
+    return selectedTheme;
+  });
   const [showThemeChangeAlert, setShowThemeChangeAlert] = useState(false);
   const [showScantronKeyboard, setShowScantronKeyboard] = useState(false);
   const [currentMultipleChoice, setCurrentMultipleChoice] = useState(null);
