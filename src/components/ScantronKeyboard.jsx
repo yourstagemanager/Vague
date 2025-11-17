@@ -92,10 +92,9 @@ function ScantronKeyboard({ onSubmit, onClose, inline = false }) {
   return (
     <div className="scantron-keyboard-overlay">
       <div className="scantron-keyboard-container">
-          <div className="scantron-display-label">YOUR RESPONSE:</div>
-          <div className="scantron-display-text">
-            {inputText || '(Click bubbles to fill in letters)'}
-          </div>
+        <div className="scantron-display-label">YOUR RESPONSE:</div>
+        <div className="scantron-display-text">
+          {inputText || '(Click bubbles to fill in letters)'}
         </div>
 
         <div className="scantron-keyboard-grid">
