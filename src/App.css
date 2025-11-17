@@ -1,0 +1,18 @@
+/* App-specific styles */
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+
+  .window {
+    margin: 10px auto;
+  }
+}
