@@ -26,6 +26,16 @@ const AI_CONFIG = {
   maxTokens: 200
 };
 
+// Debug logging - remove in production
+console.log('🤖 AI Service Configuration:', {
+  provider: AI_CONFIG.provider,
+  hasGeminiKey: !!AI_CONFIG.geminiApiKey,
+  geminiKeyLength: AI_CONFIG.geminiApiKey?.length || 0,
+  geminiModel: AI_CONFIG.geminiModel,
+  ollamaUrl: AI_CONFIG.ollamaUrl,
+  ollamaModel: AI_CONFIG.ollamaModel
+});
+
 /**
  * Call Google Gemini API
  */
@@ -121,23 +131,36 @@ async function callOllama(systemPrompt, userMessage) {
  * Main AI call function - routes to appropriate provider
  */
 export async function getAIResponse(systemPrompt, userMessage) {
+  console.log('🤖 getAIResponse called:', {
+    provider: AI_CONFIG.provider,
+    userMessageLength: userMessage?.length,
+    systemPromptLength: systemPrompt?.length
+  });
+
   try {
     switch (AI_CONFIG.provider) {
       case 'gemini':
-        return await callGemini(systemPrompt, userMessage);
+        console.log('🤖 Calling Gemini API...');
+        const geminiResponse = await callGemini(systemPrompt, userMessage);
+        console.log('🤖 Gemini response received:', geminiResponse?.substring(0, 100) + '...');
+        return geminiResponse;
 
       case 'ollama':
-        return await callOllama(systemPrompt, userMessage);
+        console.log('🤖 Calling Ollama API...');
+        const ollamaResponse = await callOllama(systemPrompt, userMessage);
+        console.log('🤖 Ollama response received:', ollamaResponse?.substring(0, 100) + '...');
+        return ollamaResponse;
 
       case 'none':
       default:
+        console.log('🤖 AI provider is "none", returning null (will use canned responses)');
         return null; // Use canned responses
     }
   } catch (error) {
-    console.error('AI call failed:', error);
+    console.error('🤖 AI call failed:', error);
 
     if (AI_CONFIG.useFallback) {
-      console.log('Falling back to canned responses');
+      console.log('🤖 Falling back to canned responses');
       return null;
     } else {
       throw error;
