@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { generateResponse, resetConversation, THEMES, getCurrentTheme } from '../utils/conversationEngine';
 import ScantronKeyboard from './ScantronKeyboard';
+import ThemePicker from './ThemePicker';
 import '../styles/windows98.css';
 import '../styles/strongbad.css';
 import '../styles/eager.css';
@@ -63,6 +64,7 @@ function Chat() {
   const [showThemeChangeAlert, setShowThemeChangeAlert] = useState(false);
   const [showScantronKeyboard, setShowScantronKeyboard] = useState(false);
   const [currentMultipleChoice, setCurrentMultipleChoice] = useState(null);
+  const [showThemePicker, setShowThemePicker] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -134,9 +136,38 @@ function Chat() {
     setCurrentMultipleChoice(null);
   };
 
+  const handleThemeSelect = (themeId) => {
+    const themeMap = {
+      'lazy': THEMES.LAZY_ASSISTANT,
+      'strongbad': THEMES.STRONG_BAD,
+      'eager': THEMES.EAGER_ASSISTANT,
+      'scantron': THEMES.SCANTRON,
+      'mapquest': THEMES.MAPQUEST,
+      'myspace': THEMES.MYSPACE,
+      'geocities': THEMES.GEOCITIES,
+      'mac': THEMES.EARLY_MAC
+    };
+
+    const newTheme = themeMap[themeId];
+    if (newTheme) {
+      setCurrentTheme(newTheme);
+      setShowThemePicker(false);
+      setShowThemeChangeAlert(true);
+      setTimeout(() => setShowThemeChangeAlert(false), 3000);
+      console.log(`%c🎨 Theme changed to: ${themeId}`, 'color: #00ff00; font-size: 14px; font-weight: bold');
+    }
+  };
+
   const handleMessageSubmit = (textInput) => {
     const inputText = textInput || inputValue;
     if (!inputText.trim()) return;
+
+    // Check for theme picker backdoor
+    if (inputText.toLowerCase().includes('show me what you got')) {
+      setShowThemePicker(true);
+      if (!textInput) setInputValue(''); // Clear input if using input field
+      return;
+    }
 
     // Check for Strong Bad email easter egg (long messages)
     const isLongMessage = inputText.length > SBEMAIL_THRESHOLD;
@@ -875,6 +906,14 @@ function Chat() {
       <ScantronKeyboard
         onSubmit={handleScantronKeyboardSubmit}
         onClose={() => setShowScantronKeyboard(false)}
+      />
+    )}
+
+    {/* Theme Picker Overlay */}
+    {showThemePicker && (
+      <ThemePicker
+        onSelectTheme={handleThemeSelect}
+        onClose={() => setShowThemePicker(false)}
       />
     )}
     </>
