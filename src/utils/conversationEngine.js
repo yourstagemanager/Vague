@@ -34,6 +34,7 @@ let scantronQuestionCount = 0;
 let scantronPencilBroken = false;
 let scantronLastSelection = null;
 let scantronWrongBubbleCount = 0;
+let scantronShowKeyboard = true; // Start with keyboard to get initial input
 
 // MapQuest specific state
 let mapquestActive = false;
@@ -979,61 +980,112 @@ function generateEagerResponse(userMessage, category) {
 function generateScantronResponse(userMessage, category) {
   scantronQuestionCount++;
 
-  // First message - instructions
+  // First message - instructions and show keyboard
   if (scantronQuestionCount === 1) {
     return {
       text: getRandomResponse(SCANTRON_RESPONSES.instructions),
-      requiresBubbles: true,
-      bubbleOptions: ['A', 'B', 'C', 'D']
+      showKeyboard: true,
+      isScantron: true
     };
   }
 
-  // Randomly break pencil (30% chance after first question)
-  if (!scantronPencilBroken && Math.random() > 0.7) {
+  // After user types something, show multiple choice question
+  const questions = [
+    {
+      question: "What type of assistance do you require?",
+      options: {
+        A: "Immediate help",
+        B: "General information",
+        C: "Technical support",
+        D: "I'm not sure"
+      }
+    },
+    {
+      question: "How would you rate your understanding of this form?",
+      options: {
+        A: "Complete understanding",
+        B: "Partial understanding",
+        C: "Minimal understanding",
+        D: "What form?"
+      }
+    },
+    {
+      question: "Which pencil shade are you using?",
+      options: {
+        A: "#2 (Correct)",
+        B: "#1 (Too soft)",
+        C: "#3 (Too hard)",
+        D: "Pen (Invalid)"
+      }
+    },
+    {
+      question: "Did you erase completely?",
+      options: {
+        A: "Yes, thoroughly",
+        B: "Mostly",
+        C: "Barely",
+        D: "I didn't erase"
+      }
+    },
+    {
+      question: "Are your bubbles filled correctly?",
+      options: {
+        A: "Perfectly filled",
+        B: "Mostly filled",
+        C: "Lightly marked",
+        D: "I used an X"
+      }
+    }
+  ];
+
+  const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+
+  // Randomly break pencil (20% chance)
+  if (!scantronPencilBroken && Math.random() > 0.8) {
     scantronPencilBroken = true;
     return {
-      text: getRandomResponse(SCANTRON_RESPONSES.pencil_breaks),
+      text: getRandomResponse(SCANTRON_RESPONSES.pencil_breaks) + "\n\n" + randomQuestion.question,
       requiresBubbles: true,
-      bubbleOptions: ['A', 'B', 'C', 'D'],
-      pencilBroken: true
+      bubbleOptions: randomQuestion.options,
+      hasOtherOption: true,
+      pencilBroken: true,
+      isScantron: true
     };
   }
 
-  //occasionally select wrong bubble (40% chance)
-  const willSelectWrongBubble = Math.random() > 0.6;
-
-  // Scanning animation
-  if (Math.random() > 0.5) {
-    const scanMessage = getRandomResponse(SCANTRON_RESPONSES.scanning);
-    setTimeout(() => {}, 1000); // Simulate scanning delay
-  }
-
-  // Randomly reject answers (30% chance)
-  if (Math.random() > 0.7) {
-    return {
-      text: getRandomResponse(SCANTRON_RESPONSES.complaints),
-      requiresBubbles: true,
-      bubbleOptions: ['A', 'B', 'C', 'D'],
-      rejected: true
-    };
-  }
-
-  // Wrong bubble selected
+  // Occasionally select wrong bubble (30% chance)
+  const willSelectWrongBubble = Math.random() > 0.7;
   if (willSelectWrongBubble) {
     scantronWrongBubbleCount++;
     return {
-      text: getRandomResponse(SCANTRON_RESPONSES.wrong_bubble),
+      text: getRandomResponse(SCANTRON_RESPONSES.wrong_bubble) + "\n\n" + randomQuestion.question,
       requiresBubbles: true,
-      bubbleOptions: ['A', 'B', 'C', 'D'],
-      wrongBubble: true
+      bubbleOptions: randomQuestion.options,
+      hasOtherOption: true,
+      wrongBubble: true,
+      isScantron: true
     };
   }
 
-  // Accepted (finally)
+  // Randomly reject answers (25% chance)
+  if (Math.random() > 0.75) {
+    return {
+      text: getRandomResponse(SCANTRON_RESPONSES.complaints) + "\n\n" + randomQuestion.question,
+      requiresBubbles: true,
+      bubbleOptions: randomQuestion.options,
+      hasOtherOption: true,
+      rejected: true,
+      isScantron: true
+    };
+  }
+
+  // Normal response with question
   return {
-    text: getRandomResponse(SCANTRON_RESPONSES.accepted),
+    text: randomQuestion.question,
     requiresBubbles: true,
-    bubbleOptions: ['A', 'B', 'C', 'D']
+    bubbleOptions: randomQuestion.options,
+    hasOtherOption: true,
+    isScantron: true
   };
 }
 
@@ -1285,6 +1337,7 @@ export function resetConversation() {
   scantronPencilBroken = false;
   scantronLastSelection = null;
   scantronWrongBubbleCount = 0;
+  scantronShowKeyboard = true;
 
   // Reset MapQuest state
   mapquestActive = false;

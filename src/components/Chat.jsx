@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { generateResponse, resetConversation, THEMES, getCurrentTheme } from '../utils/conversationEngine';
+import ScantronKeyboard from './ScantronKeyboard';
 import '../styles/windows98.css';
 import '../styles/strongbad.css';
 import '../styles/eager.css';
@@ -18,6 +19,8 @@ function Chat() {
   const [isTyping, setIsTyping] = useState(false);
   const [currentTheme, setCurrentTheme] = useState(THEMES.LAZY_ASSISTANT);
   const [showThemeChangeAlert, setShowThemeChangeAlert] = useState(false);
+  const [showScantronKeyboard, setShowScantronKeyboard] = useState(false);
+  const [currentMultipleChoice, setCurrentMultipleChoice] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -70,25 +73,42 @@ function Chat() {
     }
   }, [currentTheme]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleScantronKeyboardSubmit = (text) => {
+    setShowScantronKeyboard(false);
+    // Process the text as if user typed it normally
+    handleMessageSubmit(text);
+  };
 
-    if (!inputValue.trim()) return;
+  const handleScantronBubbleClick = (option) => {
+    // If user clicked "Other", show keyboard
+    if (option === 'OTHER') {
+      setShowScantronKeyboard(true);
+      setCurrentMultipleChoice(null);
+      return;
+    }
+
+    // Otherwise, treat this as the user's answer
+    handleMessageSubmit(`Selected: ${option}`);
+    setCurrentMultipleChoice(null);
+  };
+
+  const handleMessageSubmit = (textInput) => {
+    const inputText = textInput || inputValue;
+    if (!inputText.trim()) return;
 
     // Check for Strong Bad email easter egg (long messages)
-    const isLongMessage = inputValue.length > SBEMAIL_THRESHOLD;
+    const isLongMessage = inputText.length > SBEMAIL_THRESHOLD;
 
     // Add user message
     const userMessage = {
       id: Date.now(),
       type: 'user',
-      text: inputValue,
+      text: inputText,
       isEmail: isLongMessage
     };
 
     setMessages(prev => [...prev, userMessage]);
-    const currentInput = inputValue;
-    setInputValue('');
+    if (!textInput) setInputValue(''); // Only clear if using input field
     setIsTyping(true);
 
     // Simulate typing delay (because a lazy assistant wouldn't respond instantly)
@@ -97,7 +117,32 @@ function Chat() {
     const delay = Math.random() * 1000 + baseDelay;
 
     setTimeout(() => {
-      const responseData = generateResponse(currentInput);
+      const responseData = generateResponse(inputText);
+
+      // Check if this is a Scantron response that needs special handling
+      if (responseData.isScantron) {
+        if (responseData.showKeyboard) {
+          // Show the Scantron keyboard
+          setShowScantronKeyboard(true);
+          const assistantMessage = {
+            id: Date.now() + 1,
+            type: 'assistant',
+            text: responseData.text,
+            theme: responseData.theme
+          };
+          setMessages(prev => [...prev, assistantMessage]);
+          setIsTyping(false);
+          return;
+        } else if (responseData.requiresBubbles) {
+          // Show multiple choice options
+          setCurrentMultipleChoice({
+            question: responseData.text,
+            options: responseData.bubbleOptions,
+            hasOther: responseData.hasOtherOption
+          });
+        }
+      }
+
       const assistantMessage = {
         id: Date.now() + 1,
         type: 'assistant',
@@ -105,7 +150,11 @@ function Chat() {
         theme: responseData.theme,
         isEmail: isLongMessage,
         screenshot: responseData.screenshot,
-        showScreenshot: responseData.showScreenshot
+        showScreenshot: responseData.showScreenshot,
+        multipleChoice: responseData.requiresBubbles ? {
+          options: responseData.bubbleOptions,
+          hasOther: responseData.hasOtherOption
+        } : null
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -123,12 +172,19 @@ function Chat() {
     }, delay);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleMessageSubmit(null);
+  };
+
   const handleReset = () => {
     setMessages([]);
     resetConversation();
     setInputValue('');
     setIsTyping(false);
     setCurrentTheme(THEMES.LAZY_ASSISTANT);
+    setShowScantronKeyboard(false);
+    setCurrentMultipleChoice(null);
   };
 
   const handleMinimize = () => {
@@ -576,6 +632,7 @@ function Chat() {
   };
 
   return (
+    <>
     <div className={`window ${themeClass}`}>
       <div className={`title-bar ${themeClass}`}>
         <div className={`title-bar-text ${themeClass}`}>
@@ -651,6 +708,36 @@ function Chat() {
                       </div>
                     </div>
                   )}
+
+                  {/* Render Scantron multiple choice options */}
+                  {message.multipleChoice && message.type === 'assistant' && (
+                    <div className="scantron-multiple-choice">
+                      <div className="scantron-mc-options">
+                        {Object.entries(message.multipleChoice.options).map(([letter, text]) => (
+                          <div
+                            key={letter}
+                            className="scantron-mc-option"
+                            onClick={() => handleScantronBubbleClick(letter)}
+                          >
+                            <div className="scantron-mc-bubble"></div>
+                            <div className="scantron-mc-label">{letter})</div>
+                            <div className="scantron-mc-text">{text}</div>
+                          </div>
+                        ))}
+                        {message.multipleChoice.hasOther && (
+                          <div
+                            className="scantron-mc-option"
+                            onClick={() => handleScantronBubbleClick('OTHER')}
+                            style={{ borderColor: '#FF6600', borderStyle: 'dashed' }}
+                          >
+                            <div className="scantron-mc-bubble" style={{ borderColor: '#FF6600' }}></div>
+                            <div className="scantron-mc-label" style={{ color: '#FF6600' }}>E)</div>
+                            <div className="scantron-mc-text" style={{ fontStyle: 'italic' }}>Other (Fill in your own response)</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -671,23 +758,26 @@ function Chat() {
             <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={handleSubmit} className="input-container">
-            <input
-              type="text"
-              className={`win98-input ${themeClass}`}
-              placeholder={getPlaceholder()}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              disabled={isTyping}
-            />
-            <button
-              type="submit"
-              className={`win98-button ${themeClass}`}
-              disabled={isTyping || !inputValue.trim()}
-            >
-              {getSendButtonText()}
-            </button>
-          </form>
+          {/* Hide input form in Scantron mode when keyboard is showing or multiple choice is active */}
+          {!(isScantron && (showScantronKeyboard || currentMultipleChoice)) && (
+            <form onSubmit={handleSubmit} className="input-container">
+              <input
+                type="text"
+                className={`win98-input ${themeClass}`}
+                placeholder={getPlaceholder()}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                disabled={isTyping}
+              />
+              <button
+                type="submit"
+                className={`win98-button ${themeClass}`}
+                disabled={isTyping || !inputValue.trim()}
+              >
+                {getSendButtonText()}
+              </button>
+            </form>
+          )}
           {inputValue.length > SBEMAIL_THRESHOLD && !isStrongBad && (
             <div style={{
               fontSize: '10px',
@@ -737,6 +827,15 @@ function Chat() {
         </div>
       </div>
     </div>
+
+    {/* Scantron Keyboard Overlay */}
+    {showScantronKeyboard && (
+      <ScantronKeyboard
+        onSubmit={handleScantronKeyboardSubmit}
+        onClose={() => setShowScantronKeyboard(false)}
+      />
+    )}
+    </>
   );
 }
 

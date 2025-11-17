@@ -477,3 +477,343 @@ body.theme-scantron {
 .window-body {
   transition: all 0.5s ease;
 }
+
+/* ==================== SCANTRON KEYBOARD ==================== */
+
+.scantron-keyboard-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: overlay-fade-in 0.3s ease;
+}
+
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.scantron-keyboard-container {
+  background: var(--scantron-paper);
+  border: 4px solid var(--scantron-bubble-border);
+  border-left: 25px solid var(--scantron-bubble-border);
+  padding: 30px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  animation: keyboard-slide-up 0.3s ease;
+  position: relative;
+}
+
+@keyframes keyboard-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Black timing marks on left edge */
+.scantron-keyboard-container::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 25px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #000 0px,
+      #000 12px,
+      transparent 12px,
+      transparent 35px
+    );
+}
+
+.scantron-keyboard-header {
+  text-align: center;
+  margin-bottom: 25px;
+  padding: 15px;
+  background: var(--scantron-instruction-blue);
+  color: white;
+  border: 3px solid var(--scantron-bubble-border);
+}
+
+.scantron-keyboard-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-family: 'Arial', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.scantron-keyboard-header p {
+  margin: 0;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+}
+
+.scantron-keyboard-display {
+  background: white;
+  border: 3px solid var(--scantron-bubble-border);
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scantron-display-label {
+  font-family: 'Arial', sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--scantron-instruction-blue);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.scantron-display-text {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  min-height: 60px;
+  color: var(--scantron-text);
+  word-wrap: break-word;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px dashed var(--scantron-lines);
+}
+
+.scantron-keyboard-grid {
+  margin: 20px 0;
+}
+
+.scantron-keyboard-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  justify-content: center;
+}
+
+.scantron-keyboard-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  background: white;
+  border: 2px solid var(--scantron-bubble-border);
+  cursor: crosshair;
+  transition: all 0.2s;
+  min-width: 60px;
+  font-family: 'Arial', sans-serif;
+}
+
+.scantron-keyboard-bubble:hover {
+  background: rgba(0, 102, 204, 0.1);
+  border-color: var(--scantron-instruction-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.scantron-keyboard-bubble:active {
+  transform: translateY(0);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.bubble-letter {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--scantron-instruction-blue);
+  font-family: 'Arial', sans-serif;
+}
+
+.bubble-circle {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--scantron-bubble-border);
+  border-radius: 50%;
+  background: white;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.scantron-keyboard-bubble:hover .bubble-circle {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.scantron-keyboard-bubble:active .bubble-circle {
+  background:
+    radial-gradient(
+      circle,
+      var(--scantron-filled) 0%,
+      var(--scantron-filled) 70%,
+      var(--scantron-partial) 70%,
+      var(--scantron-partial) 100%
+    );
+  animation: bubble-fill 0.3s ease;
+}
+
+@keyframes bubble-fill {
+  from {
+    background: white;
+  }
+  to {
+    background:
+      radial-gradient(
+        circle,
+        var(--scantron-filled) 0%,
+        var(--scantron-filled) 70%,
+        var(--scantron-partial) 70%,
+        var(--scantron-partial) 100%
+      );
+  }
+}
+
+.scantron-keyboard-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.scantron-action-button {
+  flex: 1;
+  padding: 15px 20px;
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+  border: 3px solid var(--scantron-bubble-border);
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+}
+
+.scantron-backspace {
+  background: linear-gradient(180deg, #F0F0F0 0%, #D0D0D0 100%);
+  color: var(--scantron-text);
+}
+
+.scantron-backspace:hover:not(:disabled) {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E0E0E0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.scantron-submit {
+  background: linear-gradient(180deg, var(--scantron-green-accept) 0%, #004400 100%);
+  color: white;
+}
+
+.scantron-submit:hover:not(:disabled) {
+  background: linear-gradient(180deg, #007700 0%, var(--scantron-green-accept) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.scantron-action-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.scantron-action-button:disabled {
+  background: #E0E0E0;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.scantron-keyboard-warning {
+  text-align: center;
+  margin-top: 20px;
+  padding: 12px;
+  background: var(--scantron-warning);
+  color: white;
+  font-weight: bold;
+  font-family: 'Arial', sans-serif;
+  font-size: 12px;
+  border: 2px solid darkorange;
+  border-radius: 4px;
+}
+
+/* Multiple choice bubbles in chat */
+.scantron-multiple-choice {
+  margin: 20px 0;
+  padding: 20px;
+  background: white;
+  border: 3px solid var(--scantron-bubble-border);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.scantron-mc-question {
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--scantron-instruction-blue);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--scantron-lines);
+}
+
+.scantron-mc-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.scantron-mc-option {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: var(--scantron-paper);
+  border: 2px solid var(--scantron-bubble-border);
+  cursor: crosshair;
+  transition: all 0.2s;
+}
+
+.scantron-mc-option:hover {
+  background: rgba(0, 102, 204, 0.05);
+  border-color: var(--scantron-instruction-blue);
+  transform: translateX(5px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.scantron-mc-bubble {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--scantron-bubble-border);
+  border-radius: 50%;
+  background: white;
+  flex-shrink: 0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.scantron-mc-option:hover .scantron-mc-bubble {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.scantron-mc-label {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: var(--scantron-text);
+  font-weight: bold;
+}
+
+.scantron-mc-text {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  color: var(--scantron-text);
+  flex: 1;
+}
