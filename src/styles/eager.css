@@ -1,0 +1,470 @@
+/**
+ * Eager Assistant Theme
+ * Bright, cheerful, modern chatbot aesthetic
+ * Think early 2010s "helpful" chatbots like Clippy 2.0
+ */
+
+:root {
+  --eager-primary: #4CAF50;
+  --eager-secondary: #2196F3;
+  --eager-accent: #FF9800;
+  --eager-success: #8BC34A;
+  --eager-bg: #F5F5F5;
+  --eager-card-bg: #FFFFFF;
+  --eager-text: #212121;
+  --eager-text-light: #757575;
+  --eager-border: #E0E0E0;
+  --eager-gradient-start: #667eea;
+  --eager-gradient-end: #764ba2;
+  --eager-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Eager Desktop Background */
+body.theme-eager {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* Modern Card Window */
+.window.eager-theme {
+  background: var(--eager-card-bg);
+  border: none;
+  border-radius: 16px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Modern Title Bar */
+.title-bar.eager-theme {
+  background: linear-gradient(135deg, var(--eager-gradient-start), var(--eager-gradient-end));
+  padding: 20px 24px;
+  border-radius: 16px 16px 0 0;
+  border-bottom: none;
+  margin: 0;
+}
+
+.title-bar-text.eager-theme {
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.title-bar-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.title-bar-button.eager-theme {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.title-bar-button.eager-theme:nth-child(1) {
+  background: #FF5F56;
+}
+
+.title-bar-button.eager-theme:nth-child(2) {
+  background: #FFBD2E;
+}
+
+.title-bar-button.eager-theme:nth-child(3) {
+  background: #27C93F;
+}
+
+.title-bar-button.eager-theme:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
+
+/* Modern Body */
+.window-body.eager-theme {
+  background: var(--eager-bg);
+  padding: 24px;
+  color: var(--eager-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 500px;
+}
+
+/* Field Group - Chat container */
+.field-group.eager-theme {
+  border: none;
+  background: var(--eager-card-bg);
+  padding: 20px;
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--eager-shadow);
+}
+
+.field-group-title.eager-theme {
+  color: var(--eager-gradient-start);
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 16px;
+  text-transform: none;
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Scrollable area - Chat display */
+.win98-scrollable.eager-theme {
+  background: var(--eager-bg);
+  border: none;
+  border-radius: 8px;
+  padding: 16px;
+  color: var(--eager-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for Eager theme */
+.win98-scrollable.eager-theme::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+.win98-scrollable.eager-theme::-webkit-scrollbar-track {
+  background: var(--eager-border);
+  border-radius: 4px;
+}
+
+.win98-scrollable.eager-theme::-webkit-scrollbar-thumb {
+  background: var(--eager-secondary);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.win98-scrollable.eager-theme::-webkit-scrollbar-thumb:hover {
+  background: var(--eager-gradient-start);
+}
+
+/* Messages */
+.message.eager-theme {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-user.eager-theme {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin-left: 20%;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.message-assistant.eager-theme {
+  background: var(--eager-card-bg);
+  border: 2px solid var(--eager-border);
+  margin-right: 20%;
+  box-shadow: 0 2px 8px var(--eager-shadow);
+}
+
+.message-label.eager-theme {
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+}
+
+.message-user.eager-theme .message-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.message-assistant.eager-theme .message-label {
+  color: var(--eager-gradient-start);
+}
+
+.message-text.eager-theme {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.message-user.eager-theme .message-text {
+  color: white;
+}
+
+.message-assistant.eager-theme .message-text {
+  color: var(--eager-text);
+}
+
+/* Fake Screenshot */
+.fake-screenshot {
+  margin-top: 12px;
+  padding: 16px;
+  background: #FFF9C4;
+  border: 3px solid #FBC02D;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(251, 192, 45, 0.3);
+  animation: highlight 0.5s ease;
+}
+
+@keyframes highlight {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.screenshot-header {
+  font-weight: 700;
+  color: #F57F17;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.screenshot-content {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #FFD54F;
+  margin: 8px 0;
+}
+
+.screenshot-question {
+  font-weight: 600;
+  color: var(--eager-gradient-end);
+  margin-bottom: 8px;
+}
+
+.screenshot-answer {
+  color: var(--eager-primary);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.screenshot-footer {
+  font-size: 11px;
+  color: var(--eager-text-light);
+  font-style: italic;
+  margin-top: 8px;
+}
+
+/* Input */
+.win98-input.eager-theme {
+  background: white;
+  border: 2px solid var(--eager-border);
+  color: var(--eager-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 15px;
+  padding: 12px 16px;
+  border-radius: 24px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px var(--eager-shadow);
+}
+
+.win98-input.eager-theme:focus {
+  outline: none;
+  border-color: var(--eager-secondary);
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.win98-input.eager-theme::placeholder {
+  color: var(--eager-text-light);
+}
+
+/* Buttons */
+.win98-button.eager-theme {
+  background: linear-gradient(135deg, var(--eager-gradient-start), var(--eager-gradient-end));
+  border: none;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 24px;
+  border-radius: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.2s;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.win98-button.eager-theme:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.win98-button.eager-theme:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.win98-button.eager-theme:disabled {
+  background: var(--eager-border);
+  color: var(--eager-text-light);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Separator */
+.separator.eager-theme {
+  height: 1px;
+  background: var(--eager-border);
+  border: none;
+  margin: 20px 0;
+  box-shadow: none;
+}
+
+/* Status Bar */
+.status-bar.eager-theme {
+  background: var(--eager-bg);
+  border-top: 1px solid var(--eager-border);
+  color: var(--eager-text-light);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 12px;
+  padding: 12px 24px;
+  margin: 24px -24px -24px -24px;
+  border-radius: 0 0 16px 16px;
+}
+
+.status-bar-field.eager-theme {
+  border: none;
+  background: transparent;
+  padding: 0 12px;
+  color: var(--eager-text-light);
+}
+
+/* Typing indicator */
+.loading.eager-theme {
+  color: var(--eager-secondary);
+  font-style: normal;
+  font-weight: 600;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Empty state */
+.empty-state.eager-theme {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--eager-text-light);
+  font-size: 16px;
+  line-height: 2;
+}
+
+.empty-state.eager-theme strong {
+  color: var(--eager-gradient-start);
+  font-weight: 700;
+}
+
+.empty-state.eager-theme small {
+  color: var(--eager-text-light);
+  font-size: 13px;
+}
+
+/* Input container */
+.input-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.input-container .win98-input.eager-theme {
+  flex: 1;
+}
+
+/* Theme transition animations */
+.window,
+.window-body,
+.win98-button,
+.message {
+  transition: all 0.5s ease;
+}
+
+/* Badge/Chip elements */
+.eager-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--eager-success);
+  color: white;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 8px;
+}
+
+/* Loading animation for analyzing */
+.analyzing {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--eager-secondary);
+  font-weight: 600;
+}
+
+.analyzing::after {
+  content: '...';
+  animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+/* Alert banner for theme change */
+.theme-alert.eager-theme {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  color: white;
+  padding: 12px;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 8px 8px 0 0;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

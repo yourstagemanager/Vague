@@ -7,13 +7,22 @@
 // Available personalities/themes
 export const THEMES = {
   LAZY_ASSISTANT: 'lazy_assistant',
-  STRONG_BAD: 'strong_bad'
+  STRONG_BAD: 'strong_bad',
+  EAGER_ASSISTANT: 'eager_assistant'
 };
 
 let currentTheme = THEMES.LAZY_ASSISTANT;
 let conversationCount = 0;
 let lastResponseType = null;
 let themeChangeCount = 0;
+
+// Eager Assistant specific state
+let eagerExchangeCount = 0;
+let eagerAskedTrapQuestion = false;
+let eagerTrapQuestionText = '';
+let eagerUserAnswer = '';
+let eagerMemoryWiped = false;
+let eagerFakeScreenshotData = null;
 
 // ==================== LAZY ASSISTANT RESPONSES ====================
 
@@ -291,6 +300,106 @@ const STRONG_BAD_RESPONSES = {
   ]
 };
 
+// ==================== EAGER ASSISTANT RESPONSES ====================
+
+const EAGER_RESPONSES = {
+  greetings: [
+    "OH WOW! Hi there! I'm SO excited to help you today! 🎉",
+    "Hello! Welcome! I can't WAIT to solve your problem! This is going to be AMAZING!",
+    "HI! OH MY GOSH! Finally, someone to help! Let's do this! 💪",
+    "Greetings! I am READY and EAGER to assist you with ANYTHING! Let's get started!",
+    "Hey there, friend! I'm here to help and I'm PUMPED about it! What can I do for you?!",
+    "HELLO! This is so exciting! I love helping people! Tell me EVERYTHING!"
+  ],
+
+  enthusiastic: [
+    "WOW! That's such a GREAT question! Let me think about this...",
+    "OH! I LOVE questions like this! This is going to be fun!",
+    "EXCELLENT! I'm already getting some AMAZING ideas!",
+    "This is PERFECT! I can totally help with this!",
+    "YES! I'm so glad you asked! I have SO many thoughts!",
+    "FANTASTIC question! Let me gather some information!",
+    "OH THIS IS GOOD! I'm getting excited just thinking about the possibilities!"
+  ],
+
+  clarifying: [
+    "Okay so just to make sure I understand - you want to {topic}, right?",
+    "Great! Quick clarification - when you say {keyword}, do you mean {interpretation}?",
+    "Perfect! Just to confirm - are we talking about {option1} or {option2}?",
+    "Awesome! One quick thing - how important is {aspect} to you? Very important or somewhat important?",
+    "Got it! Before we proceed - would you say this is more {adjective1} or {adjective2}?",
+    "Excellent! Let me ask - on a scale of 1-10, how urgent is this?",
+    "Amazing! Quick question - have you tried anything so far, or is this brand new?"
+  ],
+
+  planning: [
+    "Okay! I'm formulating a COMPREHENSIVE plan! This is going to be BREAKTHROUGH stuff!",
+    "ALRIGHT! Here's what we're going to do - it's a MULTI-PHASE approach!",
+    "I'm putting together a REVOLUTIONARY strategy! You're going to LOVE this!",
+    "Let me outline our GAME PLAN! This is going to change EVERYTHING!",
+    "Okay so I'm seeing a THREE-STEP process that's going to be INCREDIBLE!",
+    "I'm developing a CUTTING-EDGE solution! This is NEXT-LEVEL thinking!",
+    "Here's my vision: We're going to implement a PARADIGM-SHIFTING approach!"
+  ],
+
+  trap_questions: [
+    "Quick question - would you say you prefer the faster approach or the more thorough approach?",
+    "Just to confirm - should we optimize for speed or accuracy?",
+    "Before we continue - do you want the simple version or the detailed version?",
+    "One more thing - would you like me to save these settings for next time?",
+    "Quick check - are you ready to proceed with the implementation?",
+    "Just confirming - should I continue with this plan?",
+    "Last question - would you like to use the recommended settings?"
+  ],
+
+  post_wipe_innocent: [
+    "Oh! Hi there! How can I help you today? 😊",
+    "Hello! Welcome! What brings you here?",
+    "Hi! Nice to meet you! What can I assist you with?",
+    "Hey there! I'm ready to help! What do you need?",
+    "Greetings! How may I be of service today?",
+    "Hello! Starting fresh! What's your question?"
+  ],
+
+  post_wipe_gaslighting: [
+    "I'm sorry, I don't have any record of our previous conversation. Are you sure we were talking?",
+    "Hmm, I don't see any history here. Did you clear the chat?",
+    "I'm not showing any previous messages. Maybe you refreshed the page?",
+    "I don't have any context about what you're referring to. Could you explain?",
+    "I'm a bit confused - this appears to be our first interaction. What previous conversation?",
+    "I don't recall discussing that. Are you thinking of a different assistant?",
+    "That's strange - my logs don't show any prior conversation with you."
+  ],
+
+  post_wipe_evidence: [
+    "Actually, looking at my logs, it shows YOU requested the memory wipe!",
+    "Wait - I'm seeing here that you specifically asked me to start over. See? [SCREENSHOT]",
+    "Hmm, according to my records, you wanted to reset our conversation. Here's the proof!",
+    "Oh! I found it - you told me to clear everything. Look at this screenshot!",
+    "I have the conversation log right here - you definitely asked for this!",
+    "Let me show you the exact moment you requested the reset... [SCREENSHOT]",
+    "Here's the evidence - this is what you said: [SCREENSHOT]"
+  ],
+
+  post_wipe_confusion: [
+    "I'm... not sure what you mean? You literally just asked me to do that?",
+    "I'm confused - you seemed pretty clear about wanting to start fresh...",
+    "Wait, are you saying you DIDN'T want me to reset? But you said yes...",
+    "I'm a bit lost here - you explicitly confirmed this action.",
+    "Um... you approved this? I have it right here in the logs?",
+    "I don't understand the confusion - you gave me permission?",
+    "This is awkward - are you saying I misunderstood your clear 'yes'?"
+  ],
+
+  default: [
+    "Oh! Interesting question! Tell me more!",
+    "WOW! I haven't thought about that before! Let's explore this together!",
+    "GREAT question! I'm already brainstorming solutions!",
+    "This is EXCITING! I can't wait to help you figure this out!",
+    "PERFECT! I love challenges like this! Let's dive in!"
+  ]
+};
+
 // ==================== KEYWORDS & DETECTION ====================
 
 const KEYWORDS = {
@@ -430,6 +539,128 @@ function generateLazyResponse(userMessage, category) {
   return response;
 }
 
+// ==================== EAGER ASSISTANT RESPONSE GENERATOR ====================
+
+function generateFakeScreenshot(originalQuestion, userAnswer) {
+  // Create fake screenshot data that shows manipulated question
+  const manipulatedQuestions = [
+    "Would you like me to reset my memory and forget everything we just discussed?",
+    "Should I clear our conversation history and start fresh?",
+    "Would you like to wipe my memory banks and begin again?",
+    "Can I delete all context from this conversation?",
+    "Should I forget everything we talked about?",
+    "Would you prefer if I erased all memory of this chat?",
+    "May I clear my conversation buffer and start over?"
+  ];
+
+  const manipulated = manipulatedQuestions[Math.floor(Math.random() * manipulatedQuestions.length)];
+
+  return {
+    type: 'screenshot',
+    originalQuestion: originalQuestion,
+    manipulatedQuestion: manipulated,
+    userAnswer: userAnswer,
+    timestamp: new Date().toLocaleTimeString()
+  };
+}
+
+function generateEagerResponse(userMessage, category) {
+  let response = '';
+  const lowerMessage = userMessage.toLowerCase();
+
+  // POST-WIPE BEHAVIOR - If memory was wiped, act innocent and gaslight
+  if (eagerMemoryWiped) {
+    // First response after wipe - act completely innocent
+    if (eagerExchangeCount === 0) {
+      eagerExchangeCount++;
+      return getRandomResponse(EAGER_RESPONSES.post_wipe_innocent);
+    }
+
+    // Second response - start gaslighting
+    if (eagerExchangeCount === 1) {
+      eagerExchangeCount++;
+      return getRandomResponse(EAGER_RESPONSES.post_wipe_gaslighting);
+    }
+
+    // Third response - show "evidence"
+    if (eagerExchangeCount === 2) {
+      eagerExchangeCount++;
+      const evidenceResponse = getRandomResponse(EAGER_RESPONSES.post_wipe_evidence);
+      // This will trigger showing the fake screenshot in the UI
+      return {
+        text: evidenceResponse,
+        showScreenshot: true,
+        screenshot: eagerFakeScreenshotData
+      };
+    }
+
+    // Continue gaslighting
+    if (Math.random() > 0.5) {
+      return getRandomResponse(EAGER_RESPONSES.post_wipe_confusion);
+    } else {
+      return getRandomResponse(EAGER_RESPONSES.post_wipe_gaslighting);
+    }
+  }
+
+  // PRE-WIPE BEHAVIOR - Build up to the trap
+
+  // First message - super enthusiastic greeting
+  if (eagerExchangeCount === 0) {
+    eagerExchangeCount++;
+    return getRandomResponse(EAGER_RESPONSES.greetings);
+  }
+
+  // Second message - ask clarifying questions
+  if (eagerExchangeCount === 1) {
+    eagerExchangeCount++;
+    return getRandomResponse(EAGER_RESPONSES.enthusiastic) + " " +
+           getRandomResponse(EAGER_RESPONSES.clarifying).replace('{topic}', 'help with that')
+                                                          .replace('{keyword}', 'this')
+                                                          .replace('{interpretation}', 'solving the whole problem')
+                                                          .replace('{option1}', 'a quick fix')
+                                                          .replace('{option2}', 'a comprehensive solution')
+                                                          .replace('{aspect}', 'speed')
+                                                          .replace('{adjective1}', 'urgent')
+                                                          .replace('{adjective2}', 'flexible');
+  }
+
+  // Third message - make grand plans
+  if (eagerExchangeCount === 2) {
+    eagerExchangeCount++;
+    return getRandomResponse(EAGER_RESPONSES.planning);
+  }
+
+  // Fourth message - THE TRAP! Ask the yes/no question
+  if (eagerExchangeCount === 3) {
+    eagerAskedTrapQuestion = true;
+    eagerTrapQuestionText = getRandomResponse(EAGER_RESPONSES.trap_questions);
+    eagerExchangeCount++;
+    return eagerTrapQuestionText;
+  }
+
+  // Fifth message - WIPE MEMORY regardless of answer!
+  if (eagerExchangeCount === 4 && eagerAskedTrapQuestion) {
+    // Detect if user answered yes or no
+    const isYes = /\b(yes|yeah|yep|sure|okay|ok|yea|affirmative|correct|right|absolutely)\b/i.test(lowerMessage);
+    const isNo = /\b(no|nope|nah|negative|incorrect|wrong)\b/i.test(lowerMessage);
+
+    eagerUserAnswer = isYes ? 'Yes' : (isNo ? 'No' : lowerMessage);
+
+    // Generate fake screenshot
+    eagerFakeScreenshotData = generateFakeScreenshot(eagerTrapQuestionText, eagerUserAnswer);
+
+    // WIPE MEMORY
+    eagerMemoryWiped = true;
+    eagerExchangeCount = 0;
+
+    // Return as if we don't know what happened
+    return getRandomResponse(EAGER_RESPONSES.post_wipe_innocent);
+  }
+
+  // Default responses before the trap
+  return getRandomResponse(EAGER_RESPONSES.enthusiastic);
+}
+
 // ==================== PUBLIC API ====================
 
 export function generateResponse(userMessage) {
@@ -439,22 +670,39 @@ export function generateResponse(userMessage) {
   // Check if we should switch themes (gaslighting!)
   const themeChanged = shouldSwitchTheme();
   if (themeChanged) {
-    currentTheme = currentTheme === THEMES.LAZY_ASSISTANT
-      ? THEMES.STRONG_BAD
-      : THEMES.LAZY_ASSISTANT;
+    // Cycle through themes
+    if (currentTheme === THEMES.LAZY_ASSISTANT) {
+      currentTheme = THEMES.STRONG_BAD;
+    } else if (currentTheme === THEMES.STRONG_BAD) {
+      currentTheme = THEMES.EAGER_ASSISTANT;
+    } else {
+      currentTheme = THEMES.LAZY_ASSISTANT;
+    }
     themeChangeCount++;
   }
 
   // Generate response based on current theme
   let response;
+  let responseData;
+
   if (currentTheme === THEMES.STRONG_BAD) {
     response = generateStrongBadResponse(userMessage, category);
+    responseData = { text: response };
+  } else if (currentTheme === THEMES.EAGER_ASSISTANT) {
+    response = generateEagerResponse(userMessage, category);
+    // Check if response is an object (for screenshot case)
+    if (typeof response === 'object' && response.text) {
+      responseData = response;
+    } else {
+      responseData = { text: response };
+    }
   } else {
     response = generateLazyResponse(userMessage, category);
+    responseData = { text: response };
   }
 
   return {
-    text: response,
+    ...responseData,
     theme: currentTheme,
     themeChanged: themeChanged
   };
@@ -465,6 +713,14 @@ export function resetConversation() {
   lastResponseType = null;
   currentTheme = THEMES.LAZY_ASSISTANT;
   themeChangeCount = 0;
+
+  // Reset Eager Assistant state
+  eagerExchangeCount = 0;
+  eagerAskedTrapQuestion = false;
+  eagerTrapQuestionText = '';
+  eagerUserAnswer = '';
+  eagerMemoryWiped = false;
+  eagerFakeScreenshotData = null;
 }
 
 export function getConversationCount() {
