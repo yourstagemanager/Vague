@@ -1158,153 +1158,202 @@ function generateScantronResponse(userMessage, category) {
 // ==================== MAPQUEST RESPONSE GENERATOR ====================
 
 function generateMapQuestResponse(userMessage, category) {
-  // First message - initialize with actual directions
+  const lowerMessage = userMessage.toLowerCase();
+
+  // Knowledge base: Map keywords to destinations with answers hidden in final steps
+  const destinations = [
+    {
+      keywords: ['microsoft', 'windows', 'bill gates', 'xbox', 'office'],
+      destination: "Microsoft Headquarters, Redmond, WA",
+      address: "1 Microsoft Way, Redmond, WA 98052",
+      steps: [
+        "Head northeast on Current Location Blvd toward Knowledge Ave - 0.3 mi",
+        "Turn right onto Tech Company Pkwy - 2.1 mi",
+        "Continue past the Blockbuster Video (closed 2013) - 0.5 mi",
+        "Merge onto I-90 East via the ramp to Redmond - 8.7 mi",
+        "Take exit 15 for SR-520 toward Redmond - 0.2 mi",
+        "Turn right onto 156th Ave NE - 1.4 mi",
+        "Turn left onto NE 40th St - 0.3 mi",
+        "Turn right onto Microsoft Way - 0.1 mi",
+        "Proceed to main entrance. Request appointment with Bill Gates. Ask him all your dumb questions about Windows crashing."
+      ],
+      distance: "13.6 mi",
+      time: "2 hours 15 minutes"
+    },
+    {
+      keywords: ['apple', 'iphone', 'mac', 'steve jobs', 'ipad', 'tim cook'],
+      destination: "Apple Park, Cupertino, CA",
+      address: "1 Apple Park Way, Cupertino, CA 95014",
+      steps: [
+        "Head west on Confusion St - 0.4 mi",
+        "Turn left onto Innovation Drive - 1.8 mi",
+        "Merge onto US-101 South toward San Francisco - 42.3 mi",
+        "Take exit 394 for De Anza Blvd - 0.3 mi",
+        "Turn right onto N De Anza Blvd - 2.1 mi",
+        "Continue straight onto Apple Park Way - 0.5 mi",
+        "Destination: The giant spaceship building (you can't miss it). Security will escort you to the Genius Bar where someone might explain what iOS stands for."
+      ],
+      distance: "47.4 mi",
+      time: "3 hours 45 minutes"
+    },
+    {
+      keywords: ['google', 'search', 'android', 'chrome', 'youtube', 'alphabet'],
+      destination: "Googleplex, Mountain View, CA",
+      address: "1600 Amphitheatre Parkway, Mountain View, CA",
+      steps: [
+        "Head south on Question Blvd - 0.6 mi",
+        "Turn right onto Search Engine Rd - 3.2 mi",
+        "Merge onto US-101 South - 35.8 mi",
+        "Take exit 400 for Shoreline Blvd - 0.4 mi",
+        "Turn left onto Shoreline Blvd - 1.7 mi",
+        "Turn right onto Amphitheatre Pkwy - 0.2 mi",
+        "Park near the Android lawn statues. Walk to Building 43. Tell them you're there to ask why they killed Google Reader. Prepare for blank stares."
+      ],
+      distance: "41.9 mi",
+      time: "4 hours 30 minutes"
+    },
+    {
+      keywords: ['python', 'programming', 'code', 'guido'],
+      destination: "Python Software Foundation (Historical)",
+      address: "9450 SW Gemini Dr, Beaverton, OR 97008",
+      steps: [
+        "Head north on Beginner Ave - 0.8 mi",
+        "Turn left onto Syntax Street - 2.4 mi",
+        "Merge onto I-5 North - 173.2 mi",
+        "Take exit 294 for Beaverton - 0.6 mi",
+        "Turn right onto SW Gemini Dr - 1.1 mi",
+        "Enter the office park. Find someone who knows Guido van Rossum. Ask them to explain why their snake-themed language uses indentation instead of curly braces like a normal language."
+      ],
+      distance: "178.1 mi",
+      time: "5 hours 12 minutes"
+    },
+    {
+      keywords: ['amazon', 'aws', 'bezos', 'prime', 'alexa'],
+      destination: "Amazon Headquarters, Seattle, WA",
+      address: "410 Terry Avenue North, Seattle, WA 98109",
+      steps: [
+        "Head northwest on Starting Point Rd - 0.5 mi",
+        "Turn right onto E-commerce Ave - 4.3 mi",
+        "Merge onto I-5 North toward Seattle - 28.9 mi",
+        "Take exit 167 for Mercer St - 0.3 mi",
+        "Turn left onto Mercer St - 0.6 mi",
+        "Turn right onto Terry Ave N - 0.2 mi",
+        "Look for the giant glass spheres (The Spheres). Walk inside. Locate customer service desk. Complain about a package that arrived 2 days late. They'll explain how a bookstore became an everything store."
+      ],
+      distance: "34.8 mi",
+      time: "2 hours 45 minutes"
+    },
+    {
+      keywords: ['facebook', 'meta', 'zuckerberg', 'instagram', 'whatsapp'],
+      destination: "Meta Headquarters, Menlo Park, CA",
+      address: "1 Hacker Way, Menlo Park, CA 94025",
+      steps: [
+        "Head east on Social Media Blvd - 1.2 mi",
+        "Turn left onto Privacy Invasion Pkwy - 2.8 mi",
+        "Merge onto US-101 South - 38.4 mi",
+        "Take exit 405 for Willow Road - 0.5 mi",
+        "Turn left onto Willow Rd - 1.3 mi",
+        "Turn right onto Hacker Way (yes, that's the real street name) - 0.1 mi",
+        "Find the giant LIKE button sculpture. Proceed to reception. Request meeting with Mark Zuckerberg to discuss why he renamed Facebook to Meta. Prepare for metaverse pitch."
+      ],
+      distance: "44.3 mi",
+      time: "6 hours 20 minutes"
+    },
+    {
+      keywords: ['tesla', 'elon musk', 'spacex', 'electric car'],
+      destination: "Tesla Factory, Fremont, CA",
+      address: "45500 Fremont Blvd, Fremont, CA 94538",
+      steps: [
+        "Head south on Current Ave - 0.7 mi",
+        "Turn left onto Electric Vehicle Dr - 3.6 mi",
+        "Merge onto I-880 South - 22.1 mi",
+        "Take exit 17 for Auto Mall Pkwy - 0.4 mi",
+        "Turn right onto Fremont Blvd - 1.8 mi",
+        "Look for the massive factory (former NUMMI plant). Tour the assembly line. Ask why the Cybertruck looks like a PlayStation 1 graphics glitch. Security will show you out."
+      ],
+      distance: "28.6 mi",
+      time: "1 hour 45 minutes"
+    },
+    {
+      keywords: ['nasa', 'space', 'rocket', 'astronaut', 'mars'],
+      destination: "NASA Headquarters, Washington, DC",
+      address: "300 E Street SW, Washington, DC 20546",
+      steps: [
+        "Head east on Earthbound Rd - 1.1 mi",
+        "Turn left onto Atmosphere Ave - 2.9 mi",
+        "Merge onto I-95 North - 2,847.3 mi",
+        "Take exit 1A for National Mall - 0.6 mi",
+        "Turn right onto E St SW - 0.2 mi",
+        "Enter NASA HQ. Request tour of Mission Control. Ask why we're not on Mars yet. Listen to 4-hour presentation on budget constraints."
+      ],
+      distance: "2,852.1 mi",
+      time: "43 hours 15 minutes"
+    }
+  ];
+
+  // Default generic route for questions that don't match
+  const defaultRoute = {
+    destination: "The Information You Seek",
+    address: "Somewhere on the Internet",
+    steps: [
+      "Head toward your nearest library - 0.8 mi",
+      "Turn right at the Reference Section - 0.0 mi",
+      "Continue past the card catalog (if it still exists) - 0.1 mi",
+      "Ask the librarian. They know everything. That's literally their job."
+    ],
+    distance: "0.9 mi",
+    time: "15 minutes (plus however long it takes you to admit you need help)"
+  };
+
+  // Find matching destination based on keywords
+  let route = defaultRoute;
+  for (const dest of destinations) {
+    if (dest.keywords.some(keyword => lowerMessage.includes(keyword))) {
+      route = dest;
+      break;
+    }
+  }
+
+  // Initialize on first message
   if (!mapquestActive) {
     mapquestActive = true;
     mapquestStartTime = Date.now();
     mapquestMessageIndex = 0;
 
-    // Generate a complete route with turn-by-turn directions
-    const routes = [
-      {
-        from: "Your Current Location",
-        to: "The Answer You Seek",
-        steps: [
-          "Head north on Current Situation Blvd - 0.3 mi",
-          "Turn right onto Confusion Ave - 1.2 mi",
-          "Slight left at Question Mark - 0.1 mi",
-          "Continue straight through Understanding - 0.5 mi",
-          "Turn left onto Clarity St - 0.8 mi",
-          "Destination will be on your right"
-        ],
-        totalDistance: "2.9 mi",
-        totalTime: "47 minutes"
-      },
-      {
-        from: "Starting Point",
-        to: "Solution",
-        steps: [
-          "Head east on Problem Dr toward Fix St - 0.2 mi",
-          "Turn right onto Workaround Way - 2.1 mi",
-          "Take the 3rd exit at the roundabout onto Patch Pkwy - 0.4 mi",
-          "Continue past the Blockbuster Video - 1.3 mi",
-          "Turn left at Circuit City - 0.1 mi",
-          "Slight right onto Answer Ave - 0.7 mi",
-          "Your destination is next to Borders Books"
-        ],
-        totalDistance: "4.8 mi",
-        totalTime: "1 hour 12 minutes"
-      },
-      {
-        from: "Here",
-        to: "There",
-        steps: [
-          "Head south on This Street - 0.5 mi",
-          "Turn left onto That Avenue - 0.3 mi",
-          "Continue on That Avenue - 0.0 mi",
-          "Turn right onto The Other Road - 0.1 mi",
-          "Make a U-turn - 0.1 mi",
-          "Turn right onto the street you just left - 0.2 mi",
-          "Turn left - 0.0 mi",
-          "Turn right - 0.0 mi",
-          "Turn left - 0.0 mi",
-          "Your destination is somewhere around here"
-        ],
-        totalDistance: "1.2 mi",
-        totalTime: "2 hours 15 minutes"
-      },
-      {
-        from: "Your Location",
-        to: "The Help You Need",
-        steps: [
-          "Head northwest on Lost Ave - 0.4 mi",
-          "Turn right at CompUSA - 0.9 mi",
-          "Continue through 6 states - 8.7 mi",
-          "Slight left to stay on Highway 404 - 0.0 mi",
-          "Turn right onto Dead End Dr - 1.1 mi",
-          "Destination will be behind the closed mall"
-        ],
-        totalDistance: "11.1 mi",
-        totalTime: "3 hours 45 minutes"
-      }
-    ];
-
-    const route = routes[Math.floor(Math.random() * routes.length)];
     const numberedSteps = route.steps.map((step, i) => `${i + 1}. ${step}`).join('\n');
 
     return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🗺️ MapQuest Directions
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-From: ${route.from}
-To: ${route.to}
+From: Your Current Location
+To: ${route.destination}
 
 ${numberedSteps}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Total Distance: ${route.totalDistance}
-Estimated Time: ${route.totalTime}
+Total Distance: ${route.distance}
+Estimated Time: ${route.totalTime || route.time}
 
 📄 Print these directions before you go!
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MapQuest.com © 2001 - Directions & Maps`;
   }
 
   mapquestMessageIndex++;
 
-  // Subsequent messages - more ridiculous routes
-  const followUpRoutes = [
-    {
-      reason: "faster route found",
-      steps: [
-        "Actually, take Main St instead - 0.2 mi",
-        "No wait, turn left on Oak Ave - 1.1 mi",
-        "Never mind, U-turn recommended - 0.1 mi",
-        "Return to previous route - 1.4 mi"
-      ],
-      distance: "2.8 mi",
-      time: "Same arrival time (somehow)"
-    },
-    {
-      reason: "avoiding traffic",
-      steps: [
-        "Recalculating for traffic...",
-        "New route: Turn left onto Backroad Ln - 12.3 mi",
-        "This adds 2 hours but avoids 30 seconds of traffic"
-      ],
-      distance: "15.7 mi",
-      time: "4 hours 20 minutes"
-    },
-    {
-      reason: "scenic route available",
-      steps: [
-        "For a more scenic route:",
-        "Turn right at the old gas station - 0.5 mi",
-        "Continue past where the mall used to be - 2.3 mi",
-        "Turn left at that one tree - 0.8 mi"
-      ],
-      distance: "3.6 mi",
-      time: "Who knows? Enjoy the view!"
-    }
+  // Subsequent messages - recalculating, printer prompts, etc.
+  const followUps = [
+    "Recalculating route... (You probably made a wrong turn already)",
+    "Would you like to print these directions? Of course you do. It's 2001.",
+    "🖨️ PRINT FRIENDLY VERSION AVAILABLE - Click here to waste 15 pages of paper!",
+    "Traffic update: There's traffic. There's always traffic. Plan accordingly.",
+    "Alternative route found! (It's 0.1 miles shorter but adds 45 minutes somehow)",
+    "⚠️ WARNING: This route includes a left turn. Godspeed."
   ];
 
-  // Give follow-up directions or printer prompts
-  if (Math.random() > 0.5) {
-    const update = followUpRoutes[Math.floor(Math.random() * followUpRoutes.length)];
-    const numberedSteps = update.steps.map((step, i) => `${i + 1}. ${step}`).join('\n');
-
-    return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🗺️ UPDATE: ${update.reason}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${numberedSteps}
-
-New Distance: ${update.distance}
-New Time: ${update.time}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
-  }
-
-  // Printer prompt
-  return getRandomResponse(MAPQUEST_RESPONSES.printer_prompt);
+  return getRandomResponse(followUps);
 }
 
 // ==================== MYSPACE RESPONSE GENERATOR ====================

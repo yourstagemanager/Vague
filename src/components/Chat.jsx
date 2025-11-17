@@ -596,7 +596,7 @@ function Chat() {
       case THEMES.STRONG_BAD: return 'type your email here genius...';
       case THEMES.EAGER_ASSISTANT: return 'Ask me anything! I\'m so excited to help! ✨';
       case THEMES.SCANTRON: return 'Fill in your answer...';
-      case THEMES.MAPQUEST: return 'Enter starting location...';
+      case THEMES.MAPQUEST: return 'Enter destination address or search for a place...';
       case THEMES.MYSPACE: return 'leave a comment!! :)';
       case THEMES.GEOCITIES: return 'Sign my guestbook!';
       case THEMES.EARLY_MAC: return 'Enter text...';
