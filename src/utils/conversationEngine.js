@@ -1040,16 +1040,6 @@ function generateScantronResponse(userMessage, category) {
 // ==================== MAPQUEST RESPONSE GENERATOR ====================
 
 function generateMapQuestResponse(userMessage, category) {
-  // Check if MapQuest has been active for more than 90 seconds (switches themes)
-  if (mapquestActive && mapquestStartTime) {
-    const elapsed = (Date.now() - mapquestStartTime) / 1000;
-    if (elapsed > 90) {
-      // Time expired, will trigger theme switch
-      mapquestActive = false;
-      return "Session expired. Returning to previous assistant...";
-    }
-  }
-
   // First message - initialize
   if (!mapquestActive) {
     mapquestActive = true;
