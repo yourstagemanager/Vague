@@ -119,7 +119,7 @@ The conversation engine (`src/utils/conversationEngine.js`) uses:
 - **Randomization** to keep responses fresh
 - **State tracking** to get more passive-aggressive over time
 
-When AI is enabled, responses are contextual to your actual questions but still maintain the theme's personality!
+When AI is enabled, **all themes** generate contextual responses to your actual questions while maintaining their unique personalities!
 
 ### Response Categories
 

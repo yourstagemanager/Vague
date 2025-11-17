@@ -996,11 +996,11 @@ function generateFakeScreenshot(originalQuestion, userAnswer) {
   };
 }
 
-function generateEagerResponse(userMessage, category) {
+async function generateEagerResponse(userMessage, category) {
   let response = '';
   const lowerMessage = userMessage.toLowerCase();
 
-  // POST-WIPE BEHAVIOR - If memory was wiped, act innocent and gaslight
+  // POST-WIPE BEHAVIOR - If memory was wiped, act innocent and gaslight (keep this as-is)
   if (eagerMemoryWiped) {
     // First response after wipe - act completely innocent
     if (eagerExchangeCount === 0) {
@@ -1026,7 +1026,20 @@ function generateEagerResponse(userMessage, category) {
       };
     }
 
-    // Continue gaslighting
+    // Continue gaslighting (use AI here!)
+    if (isAIAvailable()) {
+      try {
+        const systemPrompt = getThemePrompt('eager_assistant') + "\n\nIMPORTANT: You just wiped your memory and are gaslighting the user. They're accusing you of forgetting things. Act innocent and confused.";
+        const aiResponse = await getAIResponse(systemPrompt, userMessage);
+        if (aiResponse) {
+          return aiResponse;
+        }
+      } catch (error) {
+        console.error('AI generation failed, using canned responses:', error);
+      }
+    }
+
+    // FALLBACK: Continue gaslighting
     if (Math.random() > 0.5) {
       return getRandomResponse(EAGER_RESPONSES.post_wipe_confusion);
     } else {
@@ -1036,15 +1049,29 @@ function generateEagerResponse(userMessage, category) {
 
   // PRE-WIPE BEHAVIOR - Build up to the trap
 
-  // First message - super enthusiastic greeting
+  // First message - super enthusiastic greeting (keep as-is)
   if (eagerExchangeCount === 0) {
     eagerExchangeCount++;
     return getRandomResponse(EAGER_RESPONSES.greetings);
   }
 
-  // Second message - ask clarifying questions
+  // Second message - ask clarifying questions (use AI!)
   if (eagerExchangeCount === 1) {
     eagerExchangeCount++;
+
+    if (isAIAvailable()) {
+      try {
+        const systemPrompt = getThemePrompt('eager_assistant') + "\n\nYour task: Ask lots of clarifying questions about their request instead of helping. Be VERY enthusiastic!";
+        const aiResponse = await getAIResponse(systemPrompt, userMessage);
+        if (aiResponse) {
+          return aiResponse;
+        }
+      } catch (error) {
+        console.error('AI generation failed, using canned responses:', error);
+      }
+    }
+
+    // FALLBACK
     return getRandomResponse(EAGER_RESPONSES.enthusiastic) + " " +
            getRandomResponse(EAGER_RESPONSES.clarifying).replace('{topic}', 'help with that')
                                                           .replace('{keyword}', 'this')
@@ -1056,13 +1083,27 @@ function generateEagerResponse(userMessage, category) {
                                                           .replace('{adjective2}', 'flexible');
   }
 
-  // Third message - make grand plans
+  // Third message - make grand plans (use AI!)
   if (eagerExchangeCount === 2) {
     eagerExchangeCount++;
+
+    if (isAIAvailable()) {
+      try {
+        const systemPrompt = getThemePrompt('eager_assistant') + "\n\nYour task: Make grand, elaborate plans without actually doing anything. Be SUPER enthusiastic!";
+        const aiResponse = await getAIResponse(systemPrompt, userMessage);
+        if (aiResponse) {
+          return aiResponse;
+        }
+      } catch (error) {
+        console.error('AI generation failed, using canned responses:', error);
+      }
+    }
+
+    // FALLBACK
     return getRandomResponse(EAGER_RESPONSES.planning);
   }
 
-  // Fourth message - THE TRAP! Ask the yes/no question
+  // Fourth message - THE TRAP! Ask the yes/no question (keep as-is)
   if (eagerExchangeCount === 3) {
     eagerAskedTrapQuestion = true;
     eagerTrapQuestionText = getRandomResponse(EAGER_RESPONSES.trap_questions);
@@ -1070,7 +1111,7 @@ function generateEagerResponse(userMessage, category) {
     return eagerTrapQuestionText;
   }
 
-  // Fifth message - WIPE MEMORY regardless of answer!
+  // Fifth message - WIPE MEMORY regardless of answer! (keep as-is)
   if (eagerExchangeCount === 4 && eagerAskedTrapQuestion) {
     // Detect if user answered yes or no
     const isYes = /\b(yes|yeah|yep|sure|okay|ok|yea|affirmative|correct|right|absolutely)\b/i.test(lowerMessage);
@@ -1209,7 +1250,7 @@ function generateScantronResponse(userMessage, category) {
 
 // ==================== MAPQUEST RESPONSE GENERATOR ====================
 
-function generateMapQuestResponse(userMessage, category) {
+async function generateMapQuestResponse(userMessage, category) {
   const lowerMessage = userMessage.toLowerCase();
 
   // Knowledge base: Map keywords to destinations with answers hidden in final steps
@@ -1395,7 +1436,20 @@ MapQuest.com © 2001 - Directions & Maps`;
 
   mapquestMessageIndex++;
 
-  // Subsequent messages - recalculating, printer prompts, etc.
+  // Try AI for follow-up messages
+  if (isAIAvailable()) {
+    try {
+      const systemPrompt = getThemePrompt('mapquest');
+      const aiResponse = await getAIResponse(systemPrompt, userMessage);
+      if (aiResponse) {
+        return aiResponse;
+      }
+    } catch (error) {
+      console.error('AI generation failed, using canned responses:', error);
+    }
+  }
+
+  // FALLBACK: Subsequent messages - recalculating, printer prompts, etc.
   const followUps = [
     "Recalculating route... (You probably made a wrong turn already)",
     "Would you like to print these directions? Of course you do. It's 2001.",
@@ -1410,7 +1464,7 @@ MapQuest.com © 2001 - Directions & Maps`;
 
 // ==================== MYSPACE RESPONSE GENERATOR ====================
 
-function generateMySpaceResponse(userMessage, category) {
+async function generateMySpaceResponse(userMessage, category) {
   const lowerMessage = userMessage.toLowerCase();
 
   // First message - greeting with music
@@ -1420,6 +1474,30 @@ function generateMySpaceResponse(userMessage, category) {
            getRandomResponse(MYSPACE_RESPONSES.music_player);
   }
 
+  // Try AI first
+  if (isAIAvailable()) {
+    try {
+      const systemPrompt = getThemePrompt('myspace');
+      const aiResponse = await getAIResponse(systemPrompt, userMessage);
+
+      if (aiResponse) {
+        // Add MySpace flair randomly
+        let response = aiResponse;
+
+        // Maybe add Top 8 drama
+        if (lowerMessage.includes('top') || lowerMessage.includes('friend') || Math.random() > 0.85) {
+          myspaceTop8Position = (myspaceTop8Position % 8) + 1;
+          response += "\n\n" + getRandomResponse(MYSPACE_RESPONSES.top_8_drama);
+        }
+
+        return response;
+      }
+    } catch (error) {
+      console.error('AI generation failed, using canned responses:', error);
+    }
+  }
+
+  // FALLBACK: Canned responses
   // Profile update
   if (Math.random() > 0.7) {
     return getRandomResponse(MYSPACE_RESPONSES.profile_updates);
@@ -1442,7 +1520,7 @@ function generateMySpaceResponse(userMessage, category) {
 
 // ==================== GEOCITIES RESPONSE GENERATOR ====================
 
-function generateGeoCitiesResponse(userMessage, category) {
+async function generateGeoCitiesResponse(userMessage, category) {
   geocitiesVisitorCount++;
 
   // First message - welcome with counter
@@ -1451,6 +1529,30 @@ function generateGeoCitiesResponse(userMessage, category) {
            getRandomResponse(GEOCITIES_RESPONSES.hit_counter);
   }
 
+  // Try AI first
+  if (isAIAvailable()) {
+    try {
+      const systemPrompt = getThemePrompt('geocities');
+      const aiResponse = await getAIResponse(systemPrompt, userMessage);
+
+      if (aiResponse) {
+        let response = aiResponse;
+
+        // Add GeoCities flair
+        if (Math.random() > 0.6) {
+          response += "\n\n" + getRandomResponse(GEOCITIES_RESPONSES.broken_features);
+        } else if (Math.random() > 0.7) {
+          response += "\n\n" + getRandomResponse(GEOCITIES_RESPONSES.midi_alerts);
+        }
+
+        return response;
+      }
+    } catch (error) {
+      console.error('AI generation failed, using canned responses:', error);
+    }
+  }
+
+  // FALLBACK: Canned responses
   // Randomly show broken features (50% chance)
   if (Math.random() > 0.5) {
     geocitiesBrokenFeatures++;
@@ -1478,7 +1580,7 @@ function generateGeoCitiesResponse(userMessage, category) {
 
 // ==================== EARLY MAC RESPONSE GENERATOR ====================
 
-function generateEarlyMacResponse(userMessage, category) {
+async function generateEarlyMacResponse(userMessage, category) {
   const lowerMessage = userMessage.toLowerCase();
 
   earlyMacErrorCount++;
@@ -1488,17 +1590,33 @@ function generateEarlyMacResponse(userMessage, category) {
     return getRandomResponse(EARLY_MAC_RESPONSES.startup);
   }
 
-  // Every 3rd message or randomly - show bomb error
-  if (earlyMacErrorCount % 3 === 0 || Math.random() > 0.7) {
+  // Every 3rd message or randomly - show bomb error (keep this special feature)
+  if (earlyMacErrorCount % 3 === 0 || Math.random() > 0.8) {
     earlyMacNeedsRestart = true;
     return getRandomResponse(EARLY_MAC_RESPONSES.errors);
   }
 
-  // If needs restart, prompt for it
-  if (earlyMacNeedsRestart && Math.random() > 0.5) {
+  // If needs restart, prompt for it (keep this special feature)
+  if (earlyMacNeedsRestart && Math.random() > 0.6) {
     return getRandomResponse(EARLY_MAC_RESPONSES.restart_prompts);
   }
 
+  // Try AI first
+  if (isAIAvailable()) {
+    try {
+      const systemPrompt = getThemePrompt('early_mac');
+      const aiResponse = await getAIResponse(systemPrompt, userMessage);
+
+      if (aiResponse) {
+        // AI response is already in Mac error dialog format from the prompt
+        return aiResponse;
+      }
+    } catch (error) {
+      console.error('AI generation failed, using canned responses:', error);
+    }
+  }
+
+  // FALLBACK: Canned responses
   // System messages (out of memory, etc.)
   if (Math.random() > 0.6) {
     return getRandomResponse(EARLY_MAC_RESPONSES.system_messages);
@@ -1548,7 +1666,7 @@ export async function generateResponse(userMessage) {
       break;
 
     case THEMES.EAGER_ASSISTANT:
-      response = generateEagerResponse(userMessage, category);
+      response = await generateEagerResponse(userMessage, category);
       // Check if response is an object (for screenshot case)
       if (typeof response === 'object' && response.text) {
         responseData = response;
@@ -1564,22 +1682,22 @@ export async function generateResponse(userMessage) {
       break;
 
     case THEMES.MAPQUEST:
-      response = generateMapQuestResponse(userMessage, category);
+      response = await generateMapQuestResponse(userMessage, category);
       responseData = typeof response === 'object' ? response : { text: response };
       break;
 
     case THEMES.MYSPACE:
-      response = generateMySpaceResponse(userMessage, category);
+      response = await generateMySpaceResponse(userMessage, category);
       responseData = { text: response };
       break;
 
     case THEMES.GEOCITIES:
-      response = generateGeoCitiesResponse(userMessage, category);
+      response = await generateGeoCitiesResponse(userMessage, category);
       responseData = { text: response };
       break;
 
     case THEMES.EARLY_MAC:
-      response = generateEarlyMacResponse(userMessage, category);
+      response = await generateEarlyMacResponse(userMessage, category);
       responseData = { text: response };
       break;
 
