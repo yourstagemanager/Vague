@@ -1,15 +1,52 @@
 /**
  * The Lazy AI Conversation Engine
  * Generates vague, unhelpful, but amusing responses
+ * Now with multiple personalities and theme switching!
  */
 
-const RESPONSES = {
+// Available personalities/themes
+export const THEMES = {
+  LAZY_ASSISTANT: 'lazy_assistant',
+  STRONG_BAD: 'strong_bad'
+};
+
+let currentTheme = THEMES.LAZY_ASSISTANT;
+let conversationCount = 0;
+let lastResponseType = null;
+let themeChangeCount = 0;
+
+// ==================== LAZY ASSISTANT RESPONSES ====================
+
+const LAZY_RESPONSES = {
   greetings: [
     "Yeah, hi. What do you want?",
     "Oh. You're here. Great.",
     "Hello. This better be quick.",
     "Hi. I was in the middle of something... not important, but still.",
-    "Hey. Let me guess, you need help with something."
+    "Hey. Let me guess, you need help with something.",
+    "Was Clippy too busy? Fine, I'll help. Sort of."
+  ],
+
+  // NEW: Factual but sarcastic (like Marv)
+  factual_sarcastic: [
+    "This again? {answer}. Please make a note of this.",
+    "{answer}. Hope that helps. It probably won't, but hope springs eternal.",
+    "Oh, this is easy. {answer}. You're welcome, I guess.",
+    "{answer}. There, was that so hard? Wait, you weren't the one answering.",
+    "Let me Google that for you. Just kidding. {answer}. But seriously, Google exists.",
+    "{answer}. I wish someone would come take me away from these questions."
+  ],
+
+  // NEW: Meta-commentary on the question itself
+  meta_commentary: [
+    "Hmm. That's certainly a question.",
+    "Interesting choice of question.",
+    "Bold of you to ask that.",
+    "I appreciate the creativity, but no.",
+    "That's a question, alright. Technically.",
+    "You could've asked anything. And you chose... that.",
+    "Fascinating question. Wrong assistant, but fascinating.",
+    "Oh, we're doing this one again? No? Feels like we are."
   ],
 
   vague: [
@@ -22,7 +59,8 @@ const RESPONSES = {
     "I'd help you more specifically, but where's the fun in that?",
     "Look, it's either going to work or it won't. That's just science.",
     "Have you considered that maybe it doesn't matter?",
-    "I mean, technically, you could do... something. That's an option."
+    "I mean, technically, you could do... something. That's an option.",
+    "It's probably fine. Or it isn't. Hard to say."
   ],
 
   deflecting: [
@@ -35,7 +73,8 @@ const RESPONSES = {
     "Why don't you ask that friend of yours who 'knows computers'?",
     "Customer support handles this kind of thing. I'm more of an ideas guy.",
     "I'm going to redirect you to... wait, where was I going with this?",
-    "Have you checked the FAQ? I haven't, but you could."
+    "Have you checked the FAQ? I haven't, but you could.",
+    "I'll ask my friend Clippy. He loves this kind of stuff."
   ],
 
   technical: [
@@ -48,7 +87,8 @@ const RESPONSES = {
     "It might be a DNS issue. Or not. I always blame DNS when I don't know.",
     "Have you updated Adobe Reader? Just kidding, nobody knows why that matters but it does.",
     "Try using Internet Explorer. Ha, just kidding, nobody deserves that.",
-    "The solution involves right-clicking. Probably. Right-clicking fixes like 40% of computer problems."
+    "The solution involves right-clicking. Probably. Right-clicking fixes like 40% of computer problems.",
+    "It looks like you're trying to fix a problem. Would you like help? No? Good, me neither."
   ],
 
   passive_aggressive: [
@@ -61,9 +101,11 @@ const RESPONSES = {
     "That's above my pay grade. And my pay grade is $0, so that's saying something.",
     "I appreciate your optimism in thinking I'd know that.",
     "Bold of you to assume I've been paying attention.",
-    "I'm detecting some urgency in your request. That must be stressful for you."
+    "I'm detecting some urgency in your request. That must be stressful for you.",
+    "You ask a lot of questions for someone who could just... not."
   ],
 
+  // ENHANCED: More Clippy and retro assistant references
   nostalgic: [
     "Have you tried Ask Jeeves? Oh wait, wrong decade.",
     "Back in my day, we'd search for this on AltaVista. Uphill. Both ways.",
@@ -74,7 +116,12 @@ const RESPONSES = {
     "You could try posting this on MySpace. Let me know if Tom responds.",
     "Maybe there's a Lycos guide about this. Probably not, but maybe.",
     "Did you check the Webring? There was always someone in the Webring who knew stuff.",
-    "This sounds like something Clippy would've been annoying about. 'It looks like you're trying to...' yeah, we all miss him."
+    "This sounds like something Clippy would've been annoying about. 'It looks like you're trying to...' yeah, we all miss him.",
+    "Clippy would've had a six-paragraph explanation for this. I have... this.",
+    "It looks like you're trying to get help. Too bad Clippy retired.",
+    "You know who would've loved this question? Clippy. You know who doesn't? Me.",
+    "BonziBuddy would've sung you a song about this. I'm just going to... not.",
+    "Ask Jeeves would've worn a little butler outfit while not helping you. I'm not even wearing pants."
   ],
 
   gaslighting: [
@@ -87,7 +134,8 @@ const RESPONSES = {
     "We discussed this earlier. Or... did we? I feel like we did.",
     "I think you're misremembering what you asked me.",
     "That option is right where it's always been. Right there. See it? No? Interesting.",
-    "You sure you didn't solve this already? You seem like you'd remember that."
+    "You sure you didn't solve this already? You seem like you'd remember that.",
+    "Pretty sure you already knew this. Ring any bells?"
   ],
 
   phone_numbers: [
@@ -109,7 +157,9 @@ const RESPONSES = {
     "Weather happens. It's kind of its thing.",
     "I think the sun might be involved? It usually is.",
     "It's whatever it was yesterday, plus or minus some degrees.",
-    "Weather.com probably knows. They're oddly invested in this topic."
+    "Weather.com probably knows. They're oddly invested in this topic.",
+    "It's 72 degrees. Or it was 5 minutes ago. Things change, you know.",
+    "Cloudy with a chance of me not caring. But yeah, clouds."
   ],
 
   time: [
@@ -119,7 +169,8 @@ const RESPONSES = {
     "Check your phone. That's what it's for.",
     "Does it really matter? Time is relative.",
     "It's five o'clock somewhere. Not here, but somewhere.",
-    "Sometime between breakfast and dinner. That narrows it down."
+    "Sometime between breakfast and dinner. That narrows it down.",
+    "It's 2:30. Or 3:45. Definitely one of the times."
   ],
 
   directions: [
@@ -130,7 +181,8 @@ const RESPONSES = {
     "Somewhere between where you are and where you're going.",
     "Have you tried MapQuest? Just kidding, don't do that.",
     "It's approximately... elsewhere.",
-    "Follow the road until it ends. Then, I don't know, good luck?"
+    "Follow the road until it ends. Then, I don't know, good luck?",
+    "The nearest one is on Main Street. Or so I've heard. I don't get out much."
   ],
 
   math: [
@@ -157,21 +209,101 @@ const RESPONSES = {
   ]
 };
 
+// ==================== STRONG BAD RESPONSES ====================
+
+const STRONG_BAD_RESPONSES = {
+  greetings: [
+    "Oh great, another email. Just what I needed.",
+    "Ugh. What do YOU want?",
+    "Dear Strong Bad, blah blah blah... yeah yeah, I get it.",
+    "Oh boy, another question from some crap-for-brains emailer.",
+    "Let me guess, you need my EXPERT ADVICE on something stupid.",
+    "::sigh:: Fine. What is it THIS time?"
+  ],
+
+  insults: [
+    "Look, {name}, I don't have TIME for your nonsense.",
+    "Holy crap, that's the dumbest question I've heard all day. And I've heard some DOOZIES.",
+    "Are you serious right now? ARE YOU SERIOUS?",
+    "Oh man, this is like... this is ADVANCED stupid.",
+    "I can't believe I'm wasting my time on this.",
+    "Your question is bad and you should feel bad.",
+    "Did you even THINK before typing that?",
+    "Wow. Just... wow. And not the good wow."
+  ],
+
+  dismissive: [
+    "Yeah, I'm gonna go with 'no' on this one.",
+    "DELETED!",
+    "Next question. This one's broken.",
+    "I award you no points, and may The Cheat have mercy on your soul.",
+    "That's a big 'NOPE' from me, chief.",
+    "Congratulations! You've won the 'Worst Question of the Day' award! Your prize is NOTHING.",
+    "I'm not even gonna dignify that with a proper response."
+  ],
+
+  strong_bad_style: [
+    "Look, the answer is probably something dumb like {answer}. But whatever.",
+    "OK so here's the thing - {answer}. But you probably won't get it right anyway.",
+    "::types slowly:: {answer}. There. Happy now?",
+    "I GUESS the answer is {answer}. If you're into that sort of thing. Which you apparently are.",
+    "Fine, FINE. {answer}. But I'm not explaining it twice.",
+    "Alright, check it out: {answer}. Pretty cool, huh? No? Whatever."
+  ],
+
+  sign_offs: [
+    "Get out of my face.",
+    "Now leave me alone. I got stuff to do. Important stuff.",
+    "The end!",
+    "::hits send::  Good RIDDANCE.",
+    "PS - Don't email me again.",
+    "Crap for brains. Moving on!",
+    "And SCENE."
+  ],
+
+  references: [
+    "Even Homestar could figure this out. HOMESTAR.",
+    "This is worse than the time The Cheat ate all the Swedish fish.",
+    "I'd rather be checking emails from someone who KNOWS WHAT THEY'RE TALKING ABOUT.",
+    "The King of Town has better questions than this.",
+    "Even Coach Z wouldn't ask something this dumb. EVEN COACH Z.",
+    "This is like Trogdor burninating the countryside, except instead of countryside, it's my BRAIN.",
+    "Strong Sad could do better. STRONG SAD."
+  ],
+
+  technical: [
+    "Did you try punching it? Punching fixes like 90% of computer problems.",
+    "Have you tried setting it on fire? No? Well MAYBE YOU SHOULD.",
+    "It's probably because your computer sucks. Just like your question.",
+    "Error: User is a moron. Cannot compute.",
+    "Your keyboard is clearly broken. Yeah, that's the problem. ::wink::",
+    "I'm detecting a PEBKAC error. That's 'Problem Exists Between Keyboard And Chair', genius."
+  ],
+
+  default: [
+    "That question is TERRIBLE and you should FEEL TERRIBLE.",
+    "I'm not answering this. Next!",
+    "You know what? No. Just... no.",
+    "I can't even... I just... NO.",
+    "That's gonna be a 'delete' from me, dawg.",
+    "WHAT. WHAT IS THIS. WHY.",
+    "Congratulations, you broke my brain. Hope you're happy."
+  ]
+};
+
+// ==================== KEYWORDS & DETECTION ====================
+
 const KEYWORDS = {
-  greetings: ['hello', 'hi', 'hey', 'greetings', 'sup', 'yo', 'howdy'],
+  greetings: ['hello', 'hi', 'hey', 'greetings', 'sup', 'yo', 'howdy', 'dear strong bad'],
   weather: ['weather', 'temperature', 'forecast', 'rain', 'snow', 'sunny', 'cold', 'hot', 'humid'],
   time: ['time', 'clock', 'hour', 'minute', 'when'],
   directions: ['where', 'direction', 'location', 'address', 'map', 'navigate', 'route', 'how do i get'],
   math: ['calculate', 'math', 'plus', 'minus', 'multiply', 'divide', 'equation', 'sum', 'total'],
-  technical: ['computer', 'error', 'bug', 'crash', 'software', 'hardware', 'install', 'update', 'fix', 'broken', 'code', 'program']
+  technical: ['computer', 'error', 'bug', 'crash', 'software', 'hardware', 'install', 'update', 'fix', 'broken', 'code', 'program', 'app']
 };
 
-let conversationCount = 0;
-let lastResponseType = null;
+// ==================== HELPER FUNCTIONS ====================
 
-/**
- * Analyzes the user's message to determine response category
- */
 function analyzeMessage(message) {
   const lowerMessage = message.toLowerCase().trim();
 
@@ -197,40 +329,77 @@ function analyzeMessage(message) {
   return 'default';
 }
 
-/**
- * Gets a random response from an array
- */
 function getRandomResponse(responses) {
   return responses[Math.floor(Math.random() * responses.length)];
 }
 
-/**
- * Determines if we should throw in some personality
- */
 function shouldAddPersonality() {
   return Math.random() > 0.6; // 40% chance of extra personality
 }
 
-/**
- * Generates a response to the user's message
- */
-export function generateResponse(userMessage) {
-  conversationCount++;
-
-  // First message is always a greeting (even if they didn't greet)
-  if (conversationCount === 1 && !analyzeMessage(userMessage) === 'greetings') {
-    return getRandomResponse(RESPONSES.greetings);
+function shouldSwitchTheme() {
+  // After 4+ messages, small chance to switch themes (gaslighting!)
+  if (conversationCount >= 4 && themeChangeCount < 2) {
+    return Math.random() > 0.92; // 8% chance
   }
+  return false;
+}
 
-  const category = analyzeMessage(userMessage);
+// ==================== STRONG BAD RESPONSE GENERATOR ====================
+
+function generateStrongBadResponse(userMessage, category) {
   let response = '';
 
+  // Strong Bad always has a chance to just insult you
+  if (Math.random() > 0.7) {
+    response = getRandomResponse(STRONG_BAD_RESPONSES.insults);
+  } else if (category === 'greetings') {
+    response = getRandomResponse(STRONG_BAD_RESPONSES.greetings);
+  } else if (category === 'technical') {
+    response = getRandomResponse(STRONG_BAD_RESPONSES.technical);
+  } else if (Math.random() > 0.6) {
+    // Dismissive response
+    response = getRandomResponse(STRONG_BAD_RESPONSES.dismissive);
+  } else {
+    // Default snarky response
+    response = getRandomResponse(STRONG_BAD_RESPONSES.default);
+  }
+
+  // Add references sometimes
+  if (shouldAddPersonality()) {
+    response += " " + getRandomResponse(STRONG_BAD_RESPONSES.references);
+  }
+
+  // Strong Bad sometimes signs off
+  if (conversationCount > 3 && Math.random() > 0.7) {
+    response += " " + getRandomResponse(STRONG_BAD_RESPONSES.sign_offs);
+  }
+
+  return response;
+}
+
+// ==================== LAZY ASSISTANT RESPONSE GENERATOR ====================
+
+function generateLazyResponse(userMessage, category) {
+  let response = '';
+
+  // First message is always a greeting (even if they didn't greet)
+  if (conversationCount === 1 && category !== 'greetings') {
+    return getRandomResponse(LAZY_RESPONSES.greetings);
+  }
+
+  // Sometimes use meta-commentary instead of regular response
+  if (Math.random() > 0.8) {
+    response = getRandomResponse(LAZY_RESPONSES.meta_commentary);
+    return response;
+  }
+
   // Get main response
-  if (RESPONSES[category]) {
-    response = getRandomResponse(RESPONSES[category]);
+  if (LAZY_RESPONSES[category]) {
+    response = getRandomResponse(LAZY_RESPONSES[category]);
     lastResponseType = category;
   } else {
-    response = getRandomResponse(RESPONSES.default);
+    response = getRandomResponse(LAZY_RESPONSES.default);
     lastResponseType = 'default';
   }
 
@@ -242,35 +411,72 @@ export function generateResponse(userMessage) {
       " Is this going to take much longer?",
       " You ask a lot of questions.",
       " Are we almost done here?",
-      " This feels like a lot of work for a simple question."
+      " This feels like a lot of work for a simple question.",
+      " I'm getting tired of this."
     ]);
     response += extra;
   } else if (conversationCount > 5 && Math.random() > 0.7) {
     // After 5+ messages, occasionally deflect to phone number
-    response += " " + getRandomResponse(RESPONSES.phone_numbers);
+    response += " " + getRandomResponse(LAZY_RESPONSES.phone_numbers);
   } else if (shouldAddPersonality()) {
     // Random chance to add nostalgic reference or gaslighting
     if (Math.random() > 0.5) {
-      response += " " + getRandomResponse(RESPONSES.nostalgic);
+      response += " " + getRandomResponse(LAZY_RESPONSES.nostalgic);
     } else {
-      response += " " + getRandomResponse(RESPONSES.gaslighting);
+      response += " " + getRandomResponse(LAZY_RESPONSES.gaslighting);
     }
   }
 
   return response;
 }
 
-/**
- * Resets the conversation state
- */
+// ==================== PUBLIC API ====================
+
+export function generateResponse(userMessage) {
+  conversationCount++;
+  const category = analyzeMessage(userMessage);
+
+  // Check if we should switch themes (gaslighting!)
+  const themeChanged = shouldSwitchTheme();
+  if (themeChanged) {
+    currentTheme = currentTheme === THEMES.LAZY_ASSISTANT
+      ? THEMES.STRONG_BAD
+      : THEMES.LAZY_ASSISTANT;
+    themeChangeCount++;
+  }
+
+  // Generate response based on current theme
+  let response;
+  if (currentTheme === THEMES.STRONG_BAD) {
+    response = generateStrongBadResponse(userMessage, category);
+  } else {
+    response = generateLazyResponse(userMessage, category);
+  }
+
+  return {
+    text: response,
+    theme: currentTheme,
+    themeChanged: themeChanged
+  };
+}
+
 export function resetConversation() {
   conversationCount = 0;
   lastResponseType = null;
+  currentTheme = THEMES.LAZY_ASSISTANT;
+  themeChangeCount = 0;
 }
 
-/**
- * Gets the current conversation count (for debugging/stats)
- */
 export function getConversationCount() {
   return conversationCount;
+}
+
+export function getCurrentTheme() {
+  return currentTheme;
+}
+
+export function setTheme(theme) {
+  if (Object.values(THEMES).includes(theme)) {
+    currentTheme = theme;
+  }
 }

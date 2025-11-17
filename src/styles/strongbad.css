@@ -1,0 +1,405 @@
+/**
+ * Strong Bad / Homestar Runner Theme
+ * Flash-era early 2000s aesthetic
+ * Inspired by the Compy 386 and sbemails
+ */
+
+:root {
+  --sb-black: #000000;
+  --sb-screen-green: #00ff00;
+  --sb-screen-bg: #003300;
+  --sb-orange: #ff6600;
+  --sb-yellow: #ffff00;
+  --sb-red: #ff0000;
+  --sb-blue: #0066ff;
+  --sb-grey: #666666;
+  --sb-light-grey: #999999;
+  --sb-background: #333333;
+}
+
+/* Strong Bad Desktop Background */
+body.theme-strong-bad {
+  background: #333333;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255,255,255,.03) 2px,
+      rgba(255,255,255,.03) 4px
+    );
+  font-family: 'Courier New', 'Courier', monospace;
+}
+
+/* Computer Terminal Window */
+.window.strong-bad-theme {
+  background: var(--sb-black);
+  border: 4px solid var(--sb-grey);
+  box-shadow:
+    0 0 0 2px var(--sb-black),
+    0 0 20px rgba(0, 255, 0, 0.3),
+    inset 0 0 100px rgba(0, 255, 0, 0.05);
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0;
+}
+
+/* Title Bar - Compy 386 Style */
+.title-bar.strong-bad-theme {
+  background: linear-gradient(180deg, var(--sb-grey) 0%, var(--sb-black) 100%);
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--sb-light-grey);
+  margin: 0;
+}
+
+.title-bar-text.strong-bad-theme {
+  color: var(--sb-screen-green);
+  font-weight: bold;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  text-shadow:
+    0 0 5px var(--sb-screen-green),
+    0 0 10px var(--sb-screen-green);
+  letter-spacing: 2px;
+}
+
+/* Screen/Monitor Effect */
+.window-body.strong-bad-theme {
+  background: var(--sb-screen-bg);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(0,0,0,.2) 1px,
+      rgba(0,0,0,.2) 2px
+    );
+  padding: 20px;
+  color: var(--sb-screen-green);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 500px;
+  position: relative;
+
+  /* CRT screen effect */
+  animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.98; }
+  50% { opacity: 1; }
+  100% { opacity: 0.98; }
+}
+
+/* Scanline effect */
+.window-body.strong-bad-theme::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Content should be above scanlines */
+.window-body.strong-bad-theme > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Field Group - Email container */
+.field-group.strong-bad-theme {
+  border: 2px solid var(--sb-screen-green);
+  background: rgba(0, 255, 0, 0.05);
+  padding: 15px;
+  margin: 15px 0;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+}
+
+.field-group-title.strong-bad-theme {
+  color: var(--sb-yellow);
+  font-weight: bold;
+  font-size: 16px;
+  text-shadow: 0 0 5px var(--sb-yellow);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+/* Scrollable area - Email display */
+.win98-scrollable.strong-bad-theme {
+  background: var(--sb-black);
+  border: 2px solid var(--sb-screen-green);
+  padding: 10px;
+  color: var(--sb-screen-green);
+  font-family: 'Courier New', monospace;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for Strong Bad theme */
+.win98-scrollable.strong-bad-theme::-webkit-scrollbar {
+  width: 12px;
+  background: var(--sb-black);
+}
+
+.win98-scrollable.strong-bad-theme::-webkit-scrollbar-track {
+  background: var(--sb-screen-bg);
+  border: 1px solid var(--sb-screen-green);
+}
+
+.win98-scrollable.strong-bad-theme::-webkit-scrollbar-thumb {
+  background: var(--sb-screen-green);
+  border: 1px solid var(--sb-black);
+}
+
+/* Messages */
+.message.strong-bad-theme {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-left: 3px solid var(--sb-screen-green);
+  background: rgba(0, 255, 0, 0.03);
+}
+
+.message-user.strong-bad-theme {
+  border-left-color: var(--sb-yellow);
+  background: rgba(255, 255, 0, 0.05);
+}
+
+.message-assistant.strong-bad-theme {
+  border-left-color: var(--sb-orange);
+  background: rgba(255, 102, 0, 0.05);
+}
+
+.message-label.strong-bad-theme {
+  color: var(--sb-yellow);
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 3px var(--sb-yellow);
+}
+
+.message-text.strong-bad-theme {
+  color: var(--sb-screen-green);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  text-shadow: 0 0 2px var(--sb-screen-green);
+}
+
+/* Input */
+.win98-input.strong-bad-theme {
+  background: var(--sb-black);
+  border: 2px solid var(--sb-screen-green);
+  color: var(--sb-screen-green);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  padding: 8px;
+  box-shadow:
+    inset 0 0 10px rgba(0, 255, 0, 0.2),
+    0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+.win98-input.strong-bad-theme:focus {
+  outline: none;
+  box-shadow:
+    inset 0 0 10px rgba(0, 255, 0, 0.3),
+    0 0 10px rgba(0, 255, 0, 0.5);
+  animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      inset 0 0 10px rgba(0, 255, 0, 0.3),
+      0 0 10px rgba(0, 255, 0, 0.5);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 15px rgba(0, 255, 0, 0.4),
+      0 0 15px rgba(0, 255, 0, 0.7);
+  }
+}
+
+.win98-input.strong-bad-theme::placeholder {
+  color: var(--sb-grey);
+}
+
+/* Buttons */
+.win98-button.strong-bad-theme {
+  background: var(--sb-black);
+  border: 2px solid var(--sb-screen-green);
+  color: var(--sb-screen-green);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 16px;
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+  transition: all 0.2s;
+}
+
+.win98-button.strong-bad-theme:hover {
+  background: var(--sb-screen-green);
+  color: var(--sb-black);
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+  text-shadow: none;
+}
+
+.win98-button.strong-bad-theme:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.win98-button.strong-bad-theme:disabled {
+  border-color: var(--sb-grey);
+  color: var(--sb-grey);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Separator */
+.separator.strong-bad-theme {
+  height: 2px;
+  background: var(--sb-screen-green);
+  border: none;
+  margin: 15px 0;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+/* Status Bar */
+.status-bar.strong-bad-theme {
+  background: var(--sb-black);
+  border-top: 2px solid var(--sb-screen-green);
+  color: var(--sb-screen-green);
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  padding: 5px 10px;
+  margin: 20px -20px -20px -20px;
+}
+
+.status-bar-field.strong-bad-theme {
+  border: 1px solid var(--sb-screen-green);
+  background: rgba(0, 255, 0, 0.05);
+  padding: 3px 8px;
+}
+
+/* Typing indicator */
+.loading.strong-bad-theme {
+  color: var(--sb-orange);
+  font-style: italic;
+  animation: blink-sb 1s infinite;
+}
+
+@keyframes blink-sb {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+/* Email Header (for easter egg) */
+.email-header {
+  border: 2px solid var(--sb-yellow);
+  background: rgba(255, 255, 0, 0.1);
+  padding: 15px;
+  margin-bottom: 20px;
+  font-family: 'Courier New', monospace;
+}
+
+.email-from {
+  color: var(--sb-yellow);
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 5px var(--sb-yellow);
+}
+
+.email-subject {
+  color: var(--sb-orange);
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.email-body {
+  color: var(--sb-screen-green);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 10px;
+  padding: 10px;
+  border-left: 3px solid var(--sb-screen-green);
+  background: rgba(0, 255, 0, 0.03);
+}
+
+/* Compy 386 cursor */
+.strong-bad-theme input,
+.strong-bad-theme textarea {
+  caret-color: var(--sb-screen-green);
+}
+
+/* Selection */
+.strong-bad-theme ::selection {
+  background: var(--sb-screen-green);
+  color: var(--sb-black);
+}
+
+/* Screen glow effect */
+.window.strong-bad-theme::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: inset 0 0 100px rgba(0, 255, 0, 0.1);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ASCII Art support */
+.ascii-art {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--sb-screen-green);
+  white-space: pre;
+  text-shadow: 0 0 3px var(--sb-screen-green);
+}
+
+/* Theme transition */
+.window {
+  transition: all 0.5s ease;
+}
+
+.window-body {
+  transition: all 0.5s ease;
+}
+
+/* Empty state message */
+.empty-state.strong-bad-theme {
+  color: var(--sb-yellow);
+  text-align: center;
+  padding: 40px 20px;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  line-height: 2;
+  text-shadow: 0 0 5px var(--sb-yellow);
+}
+
+.empty-state.strong-bad-theme small {
+  color: var(--sb-grey);
+  font-size: 12px;
+  text-shadow: none;
+}
