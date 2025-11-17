@@ -28,6 +28,8 @@ const AI_CONFIG = {
 };
 
 // Debug logging - remove in production
+console.log('🤖🤖🤖 VERSION 2025-11-17-22:06 🤖🤖🤖');
+console.log('🤖 AI_CONFIG OBJECT:', AI_CONFIG);
 console.log('🤖 AI Service Configuration:', {
   provider: AI_CONFIG.provider,
   hasGeminiKey: !!AI_CONFIG.geminiApiKey,
