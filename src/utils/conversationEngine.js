@@ -4,6 +4,9 @@
  * Now with multiple personalities and theme switching!
  */
 
+import { getAIResponse, isAIAvailable } from '../services/aiService.js';
+import { getThemePrompt } from './themePrompts.js';
+
 // Available personalities/themes
 export const THEMES = {
   LAZY_ASSISTANT: 'lazy_assistant',
@@ -831,7 +834,30 @@ function shouldSwitchTheme() {
 
 // ==================== STRONG BAD RESPONSE GENERATOR ====================
 
-function generateStrongBadResponse(userMessage, category) {
+async function generateStrongBadResponse(userMessage, category) {
+  // Try AI first
+  if (isAIAvailable()) {
+    try {
+      const systemPrompt = getThemePrompt('strong_bad');
+      const aiResponse = await getAIResponse(systemPrompt, userMessage);
+
+      if (aiResponse) {
+        // Maybe add a Strong Bad reference or sign-off
+        let response = aiResponse;
+        if (shouldAddPersonality() && Math.random() > 0.7) {
+          response += " " + getRandomResponse(STRONG_BAD_RESPONSES.references);
+        }
+        if (conversationCount > 3 && Math.random() > 0.8) {
+          response += " " + getRandomResponse(STRONG_BAD_RESPONSES.sign_offs);
+        }
+        return response;
+      }
+    } catch (error) {
+      console.error('AI generation failed, using canned responses:', error);
+    }
+  }
+
+  // FALLBACK: Canned responses
   let response = '';
 
   // Strong Bad always has a chance to just insult you
@@ -864,13 +890,39 @@ function generateStrongBadResponse(userMessage, category) {
 
 // ==================== LAZY ASSISTANT RESPONSE GENERATOR ====================
 
-function generateLazyResponse(userMessage, category) {
-  let response = '';
-
+async function generateLazyResponse(userMessage, category) {
   // First message is always a greeting (even if they didn't greet)
   if (conversationCount === 1 && category !== 'greetings') {
     return getRandomResponse(LAZY_RESPONSES.greetings);
   }
+
+  // Try AI first
+  if (isAIAvailable()) {
+    try {
+      const systemPrompt = getThemePrompt('lazy_assistant');
+      const aiResponse = await getAIResponse(systemPrompt, userMessage);
+
+      if (aiResponse) {
+        // Add some passive-aggressive flavor based on conversation count
+        let response = aiResponse;
+        if (conversationCount > 5 && shouldAddPersonality() && Math.random() > 0.6) {
+          const extra = getRandomResponse([
+            " Look, I've got other things to do.",
+            " Is this going to take much longer?",
+            " You ask a lot of questions.",
+            " Are we almost done here?"
+          ]);
+          response += extra;
+        }
+        return response;
+      }
+    } catch (error) {
+      console.error('AI generation failed, using canned responses:', error);
+    }
+  }
+
+  // FALLBACK: Use canned responses if AI is not available
+  let response = '';
 
   // 60% of the time, give lazy but accurate responses
   if (Math.random() > 0.4) {
@@ -1467,7 +1519,7 @@ function generateEarlyMacResponse(userMessage, category) {
 
 // ==================== PUBLIC API ====================
 
-export function generateResponse(userMessage) {
+export async function generateResponse(userMessage) {
   conversationCount++;
   const category = analyzeMessage(userMessage);
 
@@ -1491,7 +1543,7 @@ export function generateResponse(userMessage) {
 
   switch (currentTheme) {
     case THEMES.STRONG_BAD:
-      response = generateStrongBadResponse(userMessage, category);
+      response = await generateStrongBadResponse(userMessage, category);
       responseData = { text: response };
       break;
 
@@ -1532,7 +1584,7 @@ export function generateResponse(userMessage) {
       break;
 
     default: // LAZY_ASSISTANT
-      response = generateLazyResponse(userMessage, category);
+      response = await generateLazyResponse(userMessage, category);
       responseData = { text: response };
       break;
   }

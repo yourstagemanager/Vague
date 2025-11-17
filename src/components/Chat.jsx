@@ -193,8 +193,8 @@ function Chat() {
     const baseDelay = isLongMessage ? 2000 : 800;
     const delay = Math.random() * 1000 + baseDelay;
 
-    setTimeout(() => {
-      const responseData = generateResponse(inputText);
+    setTimeout(async () => {
+      const responseData = await generateResponse(inputText);
 
       // Check if this is a Scantron response that needs special handling
       if (responseData.isScantron) {

@@ -1,6 +1,6 @@
 # 🤖 Lazy Assistant
 
-A delightfully unhelpful personal assistant app with a comedic twist. Built with React, styled like Windows 98, and powered by pure sarcasm (no AI API costs!).
+A delightfully unhelpful personal assistant app with a comedic twist. Built with React, styled like Windows 98, and powered by contextual AI sarcasm (or canned responses if you prefer).
 
 ## 🎭 What is This?
 
@@ -8,13 +8,57 @@ Lazy Assistant is a web-based chat application that parodies overly-helpful AI a
 
 ## ✨ Features
 
-- **Vague Responses**: Get answers that are technically correct but practically useless
+- **Contextual Sarcasm**: Responses are based on YOUR actual questions (when using AI mode)
+- **Vague but Accurate**: Get answers that are technically correct but practically useless
 - **Passive-Aggressive Personality**: The assistant doesn't want to help, and it shows
 - **Deflection Master**: Instead of helping, it'll give you phone numbers to call (that don't actually exist)
+- **Multiple Themes**: Lazy Assistant, Strong Bad, MapQuest, Scantron, and more retro personas
 - **Nostalgic References**: Callbacks to AltaVista, Ask Jeeves, MapQuest, GeoCities, and more
 - **Windows 98 UI**: Full retro interface with that classic teal desktop background
 - **Gaslighting Features**: Buttons and UI elements that mess with your expectations
-- **No API Costs**: Everything runs client-side with pattern matching and response templates
+- **Flexible AI**: Use Gemini (free), Ollama (local), or canned responses (no setup)
+
+## 🤖 AI Configuration
+
+The app now supports **contextual AI responses** that understand your questions and respond with theme-appropriate sarcasm!
+
+### Option 1: Google Gemini (Recommended for Quick Start)
+**FREE** - 250 requests/day
+
+1. Get a free API key: https://aistudio.google.com/apikey
+2. Copy `.env.example` to `.env`
+3. Set `VITE_AI_PROVIDER=gemini`
+4. Add your API key to `VITE_GEMINI_API_KEY`
+5. Run `npm run dev`
+
+**Pros**: Fast, no installation, good quality responses
+**Cons**: Daily limit (250 requests), requires internet
+
+### Option 2: Ollama (Best for Unlimited Use)
+**100% FREE** - Unlimited requests
+
+1. Install Ollama: https://ollama.com/download
+2. Run: `ollama pull llama3.2:3b`
+3. Copy `.env.example` to `.env`
+4. Set `VITE_AI_PROVIDER=ollama`
+5. Run `npm run dev`
+
+**Pros**: Completely free, unlimited, works offline, private
+**Cons**: Slower responses, requires 8-16GB RAM, installation needed
+
+**Recommended Models**:
+- `llama3.2:3b` - Fast, needs 8GB RAM (best for comedy)
+- `llama3:8b` - Better quality, needs 16GB RAM
+- `mistral:7b` - Good balance, needs 16GB RAM
+- `phi3:mini` - Lightweight, needs 8GB RAM
+
+### Option 3: No AI (Classic Mode)
+**FREE** - No limits, no setup
+
+Set `VITE_AI_PROVIDER=none` in your `.env` file to use pre-written canned responses only.
+
+**Pros**: No setup, instant responses, works anywhere
+**Cons**: Responses not contextual to your questions
 
 ## 🎨 Design Philosophy
 
@@ -68,12 +112,14 @@ src/
 ### Conversation Engine
 
 The conversation engine (`src/utils/conversationEngine.js`) uses:
+- **AI Integration** (optional) - Uses Gemini or Ollama to generate contextual sarcastic responses
+- **Theme-Based Prompts** (`src/utils/themePrompts.js`) - Each theme has a personality that guides AI responses
 - **Pattern matching** to identify keywords in user messages
-- **Response templates** categorized by type (greetings, technical, deflecting, etc.)
+- **Response templates** as fallback when AI is unavailable
 - **Randomization** to keep responses fresh
 - **State tracking** to get more passive-aggressive over time
 
-No AI APIs are used - everything is pre-written responses with clever categorization.
+When AI is enabled, responses are contextual to your actual questions but still maintain the theme's personality!
 
 ### Response Categories
 
