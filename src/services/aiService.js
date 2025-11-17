@@ -6,10 +6,11 @@
 // AI Provider configuration
 const AI_CONFIG = {
   // Provider: 'gemini' or 'ollama' or 'none'
-  provider: import.meta.env.VITE_AI_PROVIDER || 'none',
+  // TEMPORARY HARDCODED VALUES FOR TESTING - env vars not loading
+  provider: import.meta.env.VITE_AI_PROVIDER || 'gemini',
 
   // Gemini settings
-  geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
+  geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyCnmRrlN3RZqYn_lDKncFOobnLPB4aErdM',
   geminiModel: import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.0-flash-exp', // or 'gemini-1.5-flash'
 
   // Ollama settings
