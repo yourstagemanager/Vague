@@ -65,26 +65,87 @@ const LAZY_RESPONSES = {
     "Was Clippy too busy? Fine, I'll help. Sort of."
   ],
 
-  // NEW: Factual but sarcastic (like Marv)
-  factual_sarcastic: [
-    "This again? {answer}. Please make a note of this.",
-    "{answer}. Hope that helps. It probably won't, but hope springs eternal.",
-    "Oh, this is easy. {answer}. You're welcome, I guess.",
-    "{answer}. There, was that so hard? Wait, you weren't the one answering.",
-    "Let me Google that for you. Just kidding. {answer}. But seriously, Google exists.",
-    "{answer}. I wish someone would come take me away from these questions."
+  // NEW: Lazy but accurate - gives real info but minimal effort
+  lazy_accurate: [
+    "It's a thing that does stuff. Google has more details if you want them.",
+    "The answer is yes. Or no. Context would help but I'm not going to ask.",
+    "That's located in the settings. Which settings? The settings. You'll figure it out.",
+    "It works by using technology. The technical kind.",
+    "You need to click the button. It's one of the buttons. They're usually rectangular.",
+    "The solution involves steps. Multiple steps, probably.",
+    "It's in the menu. One of the menus. There are several.",
+    "You'll want to check the thing. Should be near the other thing.",
+    "The cause is either hardware or software. Those are really your only two options here.",
+    "Try the default method. Whatever that is for what you're doing.",
+    "It's a standard process. Very standard. You know, the usual.",
+    "The file format is... a format. For files. Check the extension.",
+    "Turn it on, then use it. That's basically how everything works.",
+    "The documentation explains this. It's in a document. Somewhere.",
+    "This uses an algorithm. Algorithms are involved. That's all I've got.",
+    "It's compatible with most things. Some things. Things.",
+    "The shortcut is probably Ctrl+something. Or Cmd if you're on a Mac. Maybe Alt.",
+    "You access it through the interface. The user interface. That's where users interface.",
+    "It requires permissions. The permission kind of permissions."
   ],
 
-  // NEW: Meta-commentary on the question itself
+  // Factual but frustratingly vague
+  factual_vague: [
+    "Technically, that's possible. Probability? That's a different question.",
+    "It's supported. By something. Somewhere. The details escape me.",
+    "The answer involves numbers. Possibly letters too. Depends on what you're asking.",
+    "This was implemented in a version. One of the versions. A numbered version.",
+    "It's located in a directory. Directories contain things. This is one of those things.",
+    "The fix is to change a setting. Settings can be changed. That's their whole deal.",
+    "You'll need to download something. From somewhere. The internet, probably.",
+    "It takes time. An amount of time. Could be fast, could be slow. Time is relative.",
+    "The file size is... bytes. A number of bytes. More than zero, less than infinity.",
+    "It was released on a date. In a year. During a month. Definitely happened in the past.",
+    "The format is compatible with programs. Multiple programs can open it. That's the point of formats.",
+    "You save it by clicking Save. Revolutionary, I know.",
+    "It runs on operating systems. The system kind. For operating.",
+    "The error means something went wrong. With something. That's what errors do."
+  ],
+
+  // Technically correct but unhelpful
+  technically_correct: [
+    "Every computer problem is technically a hardware problem if you think about it.",
+    "Files are just data. All of them. That's the whole concept.",
+    "If it's not working, then it's broken. If it is working, then it's not broken. See? Simple.",
+    "The internet is just computers talking to other computers. This concludes my TED talk.",
+    "Programs are instructions that tell computers what to do. Any other questions?",
+    "Electricity powers your device. Without it, nothing works. You're welcome for this insight.",
+    "Keyboards are input devices. They input things. Like this message you're reading.",
+    "Screens display pixels. Different colored pixels. That's how you see things.",
+    "Software is code. Code is text. Text makes things happen. It's very circular.",
+    "Bugs are mistakes in code. Fixing bugs means fixing mistakes. Wild concept."
+  ],
+
+  // Lazy factual - real info but bare minimum
+  lazy_factual: [
+    "It's in Properties. Right-click. You know what Properties is.",
+    "The command is in Terminal. Or Command Prompt. Whatever your OS calls it.",
+    "Check Task Manager. Or Activity Monitor. Same thing, different OS.",
+    "It's probably in System Preferences. Or Settings. Or Control Panel. One of those.",
+    "You update it through the update thing. Every program has an update thing.",
+    "The keyboard shortcut exists. It's in the menu next to the action. See? It's right there.",
+    "It's saved automatically. Or manually. Depends on your settings. Which you set.",
+    "The option is checked or unchecked. Toggle it to the other one.",
+    "Restart it. Whatever 'it' is, restart it. That fixes most things.",
+    "It's in the cloud. Everything's in the cloud now. The cloud is just someone else's computer.",
+    "Drag and drop. That's a valid method for many tasks.",
+    "The file association is set somewhere. In the settings. For associations. Of files.",
+    "It uses RAM. All programs use RAM. That's what RAM is for."
+  ],
+
   meta_commentary: [
     "Hmm. That's certainly a question.",
     "Interesting choice of question.",
     "Bold of you to ask that.",
-    "I appreciate the creativity, but no.",
+    "I appreciate the creativity, but I'll need more context.",
     "That's a question, alright. Technically.",
     "You could've asked anything. And you chose... that.",
-    "Fascinating question. Wrong assistant, but fascinating.",
-    "Oh, we're doing this one again? No? Feels like we are."
+    "Fascinating question. I'll do my best with it.",
+    "Oh, we're doing this kind of question? Okay."
   ],
 
   vague: [
@@ -811,43 +872,48 @@ function generateLazyResponse(userMessage, category) {
     return getRandomResponse(LAZY_RESPONSES.greetings);
   }
 
-  // Sometimes use meta-commentary instead of regular response
-  if (Math.random() > 0.8) {
-    response = getRandomResponse(LAZY_RESPONSES.meta_commentary);
-    return response;
+  // 60% of the time, give lazy but accurate responses
+  if (Math.random() > 0.4) {
+    const lazyButHelpful = [
+      'lazy_accurate',
+      'factual_vague',
+      'technically_correct',
+      'lazy_factual'
+    ];
+    const helpfulCategory = lazyButHelpful[Math.floor(Math.random() * lazyButHelpful.length)];
+    response = getRandomResponse(LAZY_RESPONSES[helpfulCategory]);
+    lastResponseType = helpfulCategory;
   }
-
-  // Get main response
-  if (LAZY_RESPONSES[category]) {
-    response = getRandomResponse(LAZY_RESPONSES[category]);
-    lastResponseType = category;
-  } else {
-    response = getRandomResponse(LAZY_RESPONSES.default);
-    lastResponseType = 'default';
+  // 20% meta-commentary
+  else if (Math.random() > 0.5) {
+    response = getRandomResponse(LAZY_RESPONSES.meta_commentary);
+    lastResponseType = 'meta_commentary';
+  }
+  // 20% use original category-based response
+  else {
+    if (LAZY_RESPONSES[category]) {
+      response = getRandomResponse(LAZY_RESPONSES[category]);
+      lastResponseType = category;
+    } else {
+      response = getRandomResponse(LAZY_RESPONSES.vague);
+      lastResponseType = 'vague';
+    }
   }
 
   // Add some flavor based on conversation count
-  if (conversationCount > 3 && shouldAddPersonality()) {
+  if (conversationCount > 5 && shouldAddPersonality()) {
     // User is asking too many questions, get more passive-aggressive
     const extra = getRandomResponse([
       " Look, I've got other things to do.",
       " Is this going to take much longer?",
       " You ask a lot of questions.",
       " Are we almost done here?",
-      " This feels like a lot of work for a simple question.",
-      " I'm getting tired of this."
+      " This feels like a lot of work for a simple question."
     ]);
     response += extra;
-  } else if (conversationCount > 5 && Math.random() > 0.7) {
-    // After 5+ messages, occasionally deflect to phone number
+  } else if (conversationCount > 7 && Math.random() > 0.8) {
+    // After 7+ messages, occasionally deflect to phone number
     response += " " + getRandomResponse(LAZY_RESPONSES.phone_numbers);
-  } else if (shouldAddPersonality()) {
-    // Random chance to add nostalgic reference or gaslighting
-    if (Math.random() > 0.5) {
-      response += " " + getRandomResponse(LAZY_RESPONSES.nostalgic);
-    } else {
-      response += " " + getRandomResponse(LAZY_RESPONSES.gaslighting);
-    }
   }
 
   return response;
