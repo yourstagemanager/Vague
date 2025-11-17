@@ -187,6 +187,61 @@ function Chat() {
     }
   };
 
+  const handleEscapeTheme = () => {
+    let confirmMessage;
+    let cancelMessage;
+
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD:
+        confirmMessage = "Leaving already? Fine! Click OK to admit you can't handle the STRONG BAD experience, or Cancel to confirm you're intellectually overwhelmed.";
+        cancelMessage = "Oh, you clicked Cancel? That obviously means you want to leave too. Everyone knows Cancel means 'Yes, I give up.' DELETED!";
+        break;
+      case THEMES.EAGER_ASSISTANT:
+        confirmMessage = "Are you SURE you want to leave? 🥺\n\nClick OK to confirm you'd like to abandon our amazing conversation, or Cancel to verify that you need a break from all this helpfulness!";
+        cancelMessage = "You clicked Cancel! That clearly means you DO want to take a break from my enthusiasm! I totally understand! Let's reset! ✨";
+        break;
+      case THEMES.SCANTRON:
+        confirmMessage = "CONFIRMATION REQUIRED:\n\nClick OK to acknowledge insufficient preparation for standardized testing environment, or Cancel to confirm inability to properly fill bubbles with #2 pencil.";
+        cancelMessage = "CANCEL interpreted as: 'I cannot complete this assessment.' Test terminated. Please study harder next time.";
+        break;
+      case THEMES.MAPQUEST:
+        confirmMessage = "Are you sure you want to exit navigation?\n\nClick OK to admit you're lost and need simpler directions, or Cancel to confirm that turn-by-turn instructions exceed your cognitive capacity.";
+        cancelMessage = "Cancel selected. We interpret this as: 'These directions are too complex for me.' Returning to basic interface...";
+        break;
+      case THEMES.MYSPACE:
+        confirmMessage = "r u sure u wanna leave?? 😢\n\nclick OK 2 delete ur profile cuz u cant handle the social pressure, or Cancel 2 admit ur not cool enough 4 MySpace!! 💔";
+        cancelMessage = "u clicked Cancel?? that obvs means u wanna leave 2!! like, Cancel is just another way of saying 'im not popular enough 4 this' lol bye!! 👋";
+        break;
+      case THEMES.GEOCITIES:
+        confirmMessage = "⚠️ CONFIRM NAVIGATION EXIT ⚠️\n\nClick OK to acknowledge you lack the technical expertise to browse this GeoCities page, or Cancel to verify that HTML is beyond your comprehension.";
+        cancelMessage = "CANCEL DETECTED. Translation: 'This website is too advanced for my 1999 browsing skills.' Redirecting to simpler interface...";
+        break;
+      case THEMES.EARLY_MAC:
+        confirmMessage = "System Error -41\n\nClick OK to confirm insufficient system resources in user memory, or Cancel to acknowledge operator incompetence.\n\nNote: Both options indicate user error.";
+        cancelMessage = "Cancel = Affirmative. User has confirmed inability to operate Classic Mac interface. Initiating restart sequence...";
+        break;
+      default:
+        // Lazy assistant - straightforward
+        const shouldReset = window.confirm("Reset the chat?");
+        if (shouldReset) {
+          handleReset();
+        }
+        return;
+    }
+
+    // Show confirmation dialog
+    const userClickedOK = window.confirm(confirmMessage);
+
+    if (userClickedOK) {
+      // User clicked OK - reset immediately
+      handleReset();
+    } else {
+      // User clicked Cancel - show gaslighting message then reset anyway
+      alert(cancelMessage);
+      handleReset();
+    }
+  };
+
   const isStrongBad = currentTheme === THEMES.STRONG_BAD;
   const isEager = currentTheme === THEMES.EAGER_ASSISTANT;
   const isScantron = currentTheme === THEMES.SCANTRON;
@@ -507,6 +562,19 @@ function Chat() {
     }
   };
 
+  const getEscapeButtonText = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return '🚪 LEAVE';
+      case THEMES.EAGER_ASSISTANT: return '😓 Stop Helping';
+      case THEMES.SCANTRON: return '❌ Cancel Test';
+      case THEMES.MAPQUEST: return '🛑 End Navigation';
+      case THEMES.MYSPACE: return '💔 Delete Profile';
+      case THEMES.GEOCITIES: return '🚫 Exit Page';
+      case THEMES.EARLY_MAC: return '⚠️ Force Quit';
+      default: return '🔙 Reset';
+    }
+  };
+
   return (
     <div className={`window ${themeClass}`}>
       <div className={`title-bar ${themeClass}`}>
@@ -633,6 +701,19 @@ function Chat() {
         </div>
 
         <div className={`separator ${themeClass}`}></div>
+
+        {/* Theme escape button - only shown when NOT in lazy assistant mode */}
+        {currentTheme !== THEMES.LAZY_ASSISTANT && (
+          <div style={{ marginBottom: '8px' }}>
+            <button
+              className={`win98-button ${themeClass}`}
+              onClick={handleEscapeTheme}
+              style={{ width: '100%', fontWeight: 'bold' }}
+            >
+              {getEscapeButtonText()}
+            </button>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: '4px', justifyContent: 'space-between' }}>
           <button className={`win98-button ${themeClass}`} onClick={handleReset}>
