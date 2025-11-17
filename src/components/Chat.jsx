@@ -98,6 +98,10 @@ function Chat() {
         break;
       case THEMES.SCANTRON:
         document.body.classList.add('theme-scantron');
+        // Automatically show Scantron keyboard when entering theme
+        if (messages.length === 0) {
+          setShowScantronKeyboard(true);
+        }
         break;
       case THEMES.MAPQUEST:
         document.body.classList.add('theme-mapquest');
@@ -115,7 +119,7 @@ function Chat() {
         // Lazy Assistant - no special body class needed
         break;
     }
-  }, [currentTheme]);
+  }, [currentTheme, messages.length]);
 
   const handleScantronKeyboardSubmit = (text) => {
     setShowScantronKeyboard(false);
@@ -831,8 +835,8 @@ function Chat() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Hide input form in Scantron mode when keyboard is showing or multiple choice is active */}
-          {!(isScantron && (showScantronKeyboard || currentMultipleChoice)) && (
+          {/* Hide input form completely in Scantron mode - force keyboard/bubbles only */}
+          {!isScantron && (
             <form onSubmit={handleSubmit} className="input-container">
               <input
                 type="text"

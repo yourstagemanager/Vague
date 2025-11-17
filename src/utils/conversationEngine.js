@@ -1158,38 +1158,149 @@ function generateScantronResponse(userMessage, category) {
 // ==================== MAPQUEST RESPONSE GENERATOR ====================
 
 function generateMapQuestResponse(userMessage, category) {
-  // First message - initialize
+  // First message - initialize with actual directions
   if (!mapquestActive) {
     mapquestActive = true;
     mapquestStartTime = Date.now();
     mapquestMessageIndex = 0;
-    return getRandomResponse(MAPQUEST_RESPONSES.initialization);
+
+    // Generate a complete route with turn-by-turn directions
+    const routes = [
+      {
+        from: "Your Current Location",
+        to: "The Answer You Seek",
+        steps: [
+          "Head north on Current Situation Blvd - 0.3 mi",
+          "Turn right onto Confusion Ave - 1.2 mi",
+          "Slight left at Question Mark - 0.1 mi",
+          "Continue straight through Understanding - 0.5 mi",
+          "Turn left onto Clarity St - 0.8 mi",
+          "Destination will be on your right"
+        ],
+        totalDistance: "2.9 mi",
+        totalTime: "47 minutes"
+      },
+      {
+        from: "Starting Point",
+        to: "Solution",
+        steps: [
+          "Head east on Problem Dr toward Fix St - 0.2 mi",
+          "Turn right onto Workaround Way - 2.1 mi",
+          "Take the 3rd exit at the roundabout onto Patch Pkwy - 0.4 mi",
+          "Continue past the Blockbuster Video - 1.3 mi",
+          "Turn left at Circuit City - 0.1 mi",
+          "Slight right onto Answer Ave - 0.7 mi",
+          "Your destination is next to Borders Books"
+        ],
+        totalDistance: "4.8 mi",
+        totalTime: "1 hour 12 minutes"
+      },
+      {
+        from: "Here",
+        to: "There",
+        steps: [
+          "Head south on This Street - 0.5 mi",
+          "Turn left onto That Avenue - 0.3 mi",
+          "Continue on That Avenue - 0.0 mi",
+          "Turn right onto The Other Road - 0.1 mi",
+          "Make a U-turn - 0.1 mi",
+          "Turn right onto the street you just left - 0.2 mi",
+          "Turn left - 0.0 mi",
+          "Turn right - 0.0 mi",
+          "Turn left - 0.0 mi",
+          "Your destination is somewhere around here"
+        ],
+        totalDistance: "1.2 mi",
+        totalTime: "2 hours 15 minutes"
+      },
+      {
+        from: "Your Location",
+        to: "The Help You Need",
+        steps: [
+          "Head northwest on Lost Ave - 0.4 mi",
+          "Turn right at CompUSA - 0.9 mi",
+          "Continue through 6 states - 8.7 mi",
+          "Slight left to stay on Highway 404 - 0.0 mi",
+          "Turn right onto Dead End Dr - 1.1 mi",
+          "Destination will be behind the closed mall"
+        ],
+        totalDistance: "11.1 mi",
+        totalTime: "3 hours 45 minutes"
+      }
+    ];
+
+    const route = routes[Math.floor(Math.random() * routes.length)];
+    const numberedSteps = route.steps.map((step, i) => `${i + 1}. ${step}`).join('\n');
+
+    return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🗺️ MapQuest Directions
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+From: ${route.from}
+To: ${route.to}
+
+${numberedSteps}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total Distance: ${route.totalDistance}
+Estimated Time: ${route.totalTime}
+
+📄 Print these directions before you go!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
   }
 
   mapquestMessageIndex++;
 
-  // Every other response, use city names to spell message
-  if (mapquestMessageIndex % 2 === 0) {
-    const cityMessages = Object.keys(MAPQUEST_RESPONSES.city_spellings);
-    const randomMessage = cityMessages[Math.floor(Math.random() * cityMessages.length)];
-    const cities = MAPQUEST_RESPONSES.city_spellings[randomMessage];
+  // Subsequent messages - more ridiculous routes
+  const followUpRoutes = [
+    {
+      reason: "faster route found",
+      steps: [
+        "Actually, take Main St instead - 0.2 mi",
+        "No wait, turn left on Oak Ave - 1.1 mi",
+        "Never mind, U-turn recommended - 0.1 mi",
+        "Return to previous route - 1.4 mi"
+      ],
+      distance: "2.8 mi",
+      time: "Same arrival time (somehow)"
+    },
+    {
+      reason: "avoiding traffic",
+      steps: [
+        "Recalculating for traffic...",
+        "New route: Turn left onto Backroad Ln - 12.3 mi",
+        "This adds 2 hours but avoids 30 seconds of traffic"
+      ],
+      distance: "15.7 mi",
+      time: "4 hours 20 minutes"
+    },
+    {
+      reason: "scenic route available",
+      steps: [
+        "For a more scenic route:",
+        "Turn right at the old gas station - 0.5 mi",
+        "Continue past where the mall used to be - 2.3 mi",
+        "Turn left at that one tree - 0.8 mi"
+      ],
+      distance: "3.6 mi",
+      time: "Who knows? Enjoy the view!"
+    }
+  ];
 
-    return {
-      text: `Directions: ${cities.map((city, i) => `${i + 1}. ${city}`).join(' → ')}`,
-      isCitySpelling: true,
-      spellsOut: randomMessage.toUpperCase()
-    };
-  }
+  // Give follow-up directions or printer prompts
+  if (Math.random() > 0.5) {
+    const update = followUpRoutes[Math.floor(Math.random() * followUpRoutes.length)];
+    const numberedSteps = update.steps.map((step, i) => `${i + 1}. ${step}`).join('\n');
 
-  // Give ridiculous directions
-  if (Math.random() > 0.6) {
-    return getRandomResponse(MAPQUEST_RESPONSES.directions) + "\n\n" +
-           getRandomResponse(MAPQUEST_RESPONSES.excessive_steps);
-  }
+    return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🗺️ UPDATE: ${update.reason}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  // Outdated landmarks
-  if (Math.random() > 0.7) {
-    return getRandomResponse(MAPQUEST_RESPONSES.outdated);
+${numberedSteps}
+
+New Distance: ${update.distance}
+New Time: ${update.time}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
   }
 
   // Printer prompt
