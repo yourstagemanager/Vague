@@ -1,0 +1,646 @@
+/**
+ * Early Mac Theme
+ * System 7 / Classic Mac OS aesthetic (1991-1997)
+ * Chicago font, bomb dialogs, platinum grey, happy Mac
+ */
+
+:root {
+  --mac-platinum: #DDDDDD;
+  --mac-light-grey: #EEEEEE;
+  --mac-dark-grey: #888888;
+  --mac-black: #000000;
+  --mac-white: #FFFFFF;
+  --mac-blue: #0000FF;
+  --mac-menu-blue: #0000AA;
+  --mac-highlight: #000080;
+  --mac-window-stripe: #CCCCCC;
+  --mac-shadow: #777777;
+}
+
+/* Classic Mac Desktop */
+body.theme-early-mac {
+  background: var(--mac-platinum);
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 1px,
+      rgba(255, 255, 255, 0.1) 1px,
+      rgba(255, 255, 255, 0.1) 2px
+    );
+  font-family: 'Chicago', 'Geneva', 'Charcoal', sans-serif;
+}
+
+/* Mac Window */
+.window.earlymac-theme {
+  background: var(--mac-white);
+  border: 2px solid var(--mac-black);
+  box-shadow:
+    2px 2px 0 var(--mac-black),
+    0 0 0 1px var(--mac-white) inset;
+  max-width: 640px;
+  margin: 40px auto;
+  padding: 0;
+  image-rendering: pixelated;
+  font-family: 'Chicago', 'Geneva', sans-serif;
+}
+
+/* Title Bar - Classic Mac style with stripes */
+.title-bar.earlymac-theme {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--mac-white) 0px,
+      var(--mac-white) 1px,
+      var(--mac-black) 1px,
+      var(--mac-black) 2px
+    );
+  padding: 0;
+  border-bottom: 2px solid var(--mac-black);
+  margin: 0;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.title-bar-text.earlymac-theme {
+  color: var(--mac-black);
+  font-weight: bold;
+  font-size: 12px;
+  font-family: 'Chicago', 'Geneva', sans-serif;
+  text-align: center;
+  flex: 1;
+  background: var(--mac-white);
+  padding: 2px 8px;
+  margin: 0 30px;
+  border: 1px solid var(--mac-black);
+}
+
+/* Close box (top left) */
+.title-bar.earlymac-theme::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--mac-black);
+  background: var(--mac-white);
+  box-shadow: inset 0 0 0 1px var(--mac-black);
+}
+
+/* Window Body */
+.window-body.earlymac-theme {
+  background: var(--mac-white);
+  padding: 16px;
+  color: var(--mac-black);
+  font-family: 'Geneva', 'Chicago', sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 400px;
+  border-top: 1px solid var(--mac-platinum);
+}
+
+/* System Alert / Bomb Dialog */
+.mac-alert {
+  background: var(--mac-white);
+  border: 3px solid var(--mac-black);
+  box-shadow:
+    4px 4px 0 var(--mac-black),
+    0 0 0 1px var(--mac-white) inset;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 400px;
+  text-align: center;
+  animation: alert-shake 0.5s ease;
+}
+
+@keyframes alert-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.mac-alert-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.mac-alert-title {
+  font-family: 'Chicago', sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.mac-alert-message {
+  font-family: 'Geneva', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.mac-alert-code {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 10px;
+  background: var(--mac-platinum);
+  padding: 8px;
+  border: 1px solid var(--mac-black);
+  margin-top: 12px;
+}
+
+/* Bomb Icon */
+.bomb-icon {
+  display: inline-block;
+  font-size: 64px;
+  animation: bomb-blink 1s infinite;
+}
+
+@keyframes bomb-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+/* Field Group - Content area */
+.field-group.earlymac-theme {
+  background: var(--mac-white);
+  border: 2px solid var(--mac-black);
+  padding: 12px;
+  margin: 12px 0;
+  box-shadow:
+    2px 2px 0 var(--mac-shadow),
+    inset 1px 1px 0 var(--mac-platinum);
+}
+
+.field-group-title.earlymac-theme {
+  color: var(--mac-black);
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 10px;
+  font-family: 'Chicago', sans-serif;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--mac-black);
+  padding-bottom: 4px;
+}
+
+/* Scrollable area */
+.win98-scrollable.earlymac-theme {
+  background: var(--mac-white);
+  border: 2px solid var(--mac-black);
+  padding: 8px;
+  color: var(--mac-black);
+  font-family: 'Geneva', sans-serif;
+  overflow-y: auto;
+  box-shadow: inset 1px 1px 0 var(--mac-shadow);
+}
+
+/* Custom scrollbar - Mac Classic style */
+.win98-scrollable.earlymac-theme::-webkit-scrollbar {
+  width: 16px;
+  background: var(--mac-white);
+  border-left: 1px solid var(--mac-black);
+}
+
+.win98-scrollable.earlymac-theme::-webkit-scrollbar-track {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      var(--mac-platinum),
+      var(--mac-platinum) 2px,
+      var(--mac-white) 2px,
+      var(--mac-white) 4px
+    );
+  border: 1px solid var(--mac-black);
+}
+
+.win98-scrollable.earlymac-theme::-webkit-scrollbar-thumb {
+  background: var(--mac-white);
+  border: 2px solid var(--mac-black);
+  box-shadow: inset 0 0 0 1px var(--mac-platinum);
+}
+
+.win98-scrollable.earlymac-theme::-webkit-scrollbar-button {
+  background: var(--mac-platinum);
+  border: 1px solid var(--mac-black);
+  height: 16px;
+}
+
+/* Messages */
+.message.earlymac-theme {
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid var(--mac-black);
+  background: var(--mac-light-grey);
+  font-family: 'Geneva', sans-serif;
+}
+
+.message-user.earlymac-theme {
+  background: var(--mac-white);
+  border: 2px solid var(--mac-black);
+}
+
+.message-assistant.earlymac-theme {
+  background: var(--mac-platinum);
+  border: 2px solid var(--mac-black);
+}
+
+.message-label.earlymac-theme {
+  font-weight: bold;
+  font-size: 10px;
+  margin-bottom: 6px;
+  font-family: 'Chicago', sans-serif;
+  text-transform: uppercase;
+}
+
+.message-text.earlymac-theme {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--mac-black);
+  font-family: 'Geneva', sans-serif;
+}
+
+/* System Error Message */
+.system-error {
+  background: var(--mac-white);
+  border: 3px solid var(--mac-black);
+  padding: 16px;
+  margin: 12px 0;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 11px;
+  box-shadow:
+    3px 3px 0 var(--mac-black),
+    inset 0 0 0 1px var(--mac-platinum);
+}
+
+.system-error-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-family: 'Chicago', sans-serif;
+}
+
+.system-error-details {
+  background: var(--mac-platinum);
+  padding: 8px;
+  border: 1px solid var(--mac-black);
+  margin-top: 8px;
+}
+
+/* Out of Memory warning */
+.out-of-memory {
+  background: var(--mac-white);
+  border: 3px solid var(--mac-black);
+  padding: 20px;
+  margin: 12px 0;
+  text-align: center;
+  box-shadow: 4px 4px 0 var(--mac-black);
+}
+
+.out-of-memory-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.out-of-memory-text {
+  font-family: 'Geneva', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Restart prompt */
+.restart-prompt {
+  background: var(--mac-black);
+  color: var(--mac-white);
+  padding: 40px 20px;
+  margin: 20px 0;
+  text-align: center;
+  font-family: 'Chicago', sans-serif;
+  font-size: 14px;
+  border: 4px solid var(--mac-black);
+  position: relative;
+}
+
+.restart-prompt::before {
+  content: '⌘';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+}
+
+/* Input - Classic Mac text field */
+.win98-input.earlymac-theme {
+  background: var(--mac-white);
+  border: 2px solid var(--mac-black);
+  color: var(--mac-black);
+  font-family: 'Geneva', sans-serif;
+  font-size: 12px;
+  padding: 6px 8px;
+  box-shadow: inset 1px 1px 0 var(--mac-shadow);
+}
+
+.win98-input.earlymac-theme:focus {
+  outline: none;
+  box-shadow:
+    inset 1px 1px 0 var(--mac-shadow),
+    0 0 0 2px var(--mac-highlight);
+}
+
+.win98-input.earlymac-theme::placeholder {
+  color: var(--mac-dark-grey);
+  font-style: italic;
+}
+
+/* Buttons - Classic Mac 3D buttons */
+.win98-button.earlymac-theme {
+  background: var(--mac-platinum);
+  border: 2px solid var(--mac-black);
+  color: var(--mac-black);
+  font-family: 'Chicago', sans-serif;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 6px 16px;
+  cursor: pointer;
+  box-shadow:
+    2px 2px 0 var(--mac-shadow),
+    inset 1px 1px 0 var(--mac-white);
+  transition: none;
+  border-radius: 4px;
+  min-width: 70px;
+}
+
+.win98-button.earlymac-theme:hover {
+  background: var(--mac-light-grey);
+}
+
+.win98-button.earlymac-theme:active {
+  background: var(--mac-black);
+  color: var(--mac-white);
+  box-shadow:
+    inset 2px 2px 0 var(--mac-shadow),
+    0 0 0 2px var(--mac-black);
+}
+
+.win98-button.earlymac-theme:disabled {
+  background: var(--mac-platinum);
+  color: var(--mac-dark-grey);
+  cursor: not-allowed;
+  box-shadow: 1px 1px 0 var(--mac-shadow);
+}
+
+/* Default button (has thick border) */
+.win98-button.earlymac-theme.default {
+  border: 4px solid var(--mac-black);
+  box-shadow:
+    2px 2px 0 var(--mac-shadow),
+    inset 1px 1px 0 var(--mac-white),
+    inset -1px -1px 0 var(--mac-dark-grey);
+}
+
+/* Separator - Simple line */
+.separator.earlymac-theme {
+  height: 1px;
+  background: var(--mac-black);
+  border: none;
+  margin: 12px 0;
+}
+
+/* Status Bar - Mac style */
+.status-bar.earlymac-theme {
+  background: var(--mac-platinum);
+  border-top: 2px solid var(--mac-black);
+  color: var(--mac-black);
+  font-family: 'Geneva', sans-serif;
+  font-size: 10px;
+  padding: 4px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-bar-field.earlymac-theme {
+  border: 1px solid var(--mac-black);
+  background: var(--mac-white);
+  padding: 2px 6px;
+}
+
+/* Loading indicator - Watch cursor */
+.loading.earlymac-theme {
+  color: var(--mac-black);
+  font-weight: bold;
+  font-family: 'Geneva', sans-serif;
+  animation: watch-blink 1s infinite;
+}
+
+.loading.earlymac-theme::before {
+  content: '⌚ ';
+}
+
+@keyframes watch-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.5; }
+}
+
+/* Empty state */
+.empty-state.earlymac-theme {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--mac-black);
+  font-family: 'Geneva', sans-serif;
+  line-height: 1.8;
+}
+
+.empty-state.earlymac-theme strong {
+  font-size: 14px;
+  font-family: 'Chicago', sans-serif;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.empty-state.earlymac-theme small {
+  color: var(--mac-dark-grey);
+  font-size: 10px;
+}
+
+/* Happy Mac icon */
+.happy-mac {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  background: var(--mac-white);
+  border: 3px solid var(--mac-black);
+  position: relative;
+  margin: 20px auto;
+}
+
+.happy-mac::before {
+  content: '😊';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+}
+
+/* Sad Mac icon */
+.sad-mac {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  background: var(--mac-white);
+  border: 3px solid var(--mac-black);
+  position: relative;
+  margin: 20px auto;
+}
+
+.sad-mac::before {
+  content: '😞';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+}
+
+/* Menu bar item (for decoration) */
+.mac-menu-item {
+  background: var(--mac-white);
+  border: 1px solid var(--mac-black);
+  padding: 4px 12px;
+  display: inline-block;
+  font-family: 'Chicago', sans-serif;
+  font-size: 12px;
+  margin: 4px;
+  cursor: pointer;
+}
+
+.mac-menu-item:active {
+  background: var(--mac-black);
+  color: var(--mac-white);
+}
+
+/* Progress bar (classic Mac style) */
+.mac-progress {
+  width: 100%;
+  height: 20px;
+  background: var(--mac-white);
+  border: 2px solid var(--mac-black);
+  position: relative;
+  overflow: hidden;
+}
+
+.mac-progress-fill {
+  height: 100%;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      var(--mac-black),
+      var(--mac-black) 4px,
+      var(--mac-white) 4px,
+      var(--mac-white) 8px
+    );
+  animation: progress-march 0.5s linear infinite;
+}
+
+@keyframes progress-march {
+  from { background-position: 0 0; }
+  to { background-position: 8px 0; }
+}
+
+/* Dialog buttons container */
+.dialog-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* Startup chime visual */
+.startup-chime {
+  background: var(--mac-black);
+  color: var(--mac-white);
+  text-align: center;
+  padding: 60px 20px;
+  font-family: 'Chicago', sans-serif;
+  font-size: 18px;
+  animation: chime-fade 2s ease;
+}
+
+@keyframes chime-fade {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Theme transition */
+.window,
+.window-body {
+  transition: none; /* Mac didn't have smooth transitions */
+}
+
+/* Pixelated cursor effect */
+.earlymac-theme * {
+  cursor: default;
+  image-rendering: pixelated;
+}
+
+.earlymac-theme button {
+  cursor: pointer;
+}
+
+/* System Font simulation */
+@font-face {
+  font-family: 'Chicago';
+  src: local('Chicago'), local('Geneva');
+  font-weight: bold;
+}
+
+/* About box style */
+.about-box {
+  background: var(--mac-white);
+  border: 3px solid var(--mac-black);
+  padding: 20px;
+  text-align: center;
+  box-shadow: 4px 4px 0 var(--mac-black);
+}
+
+.about-box-title {
+  font-family: 'Chicago', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.about-box-version {
+  font-family: 'Geneva', sans-serif;
+  font-size: 10px;
+  color: var(--mac-dark-grey);
+  margin-top: 8px;
+}
+
+/* Trash can (decorative) */
+.trash-can {
+  width: 48px;
+  height: 64px;
+  background: var(--mac-white);
+  border: 2px solid var(--mac-black);
+  position: relative;
+  margin: 20px auto;
+}
+
+.trash-can::before {
+  content: '🗑️';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+}

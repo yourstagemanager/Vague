@@ -3,6 +3,11 @@ import { generateResponse, resetConversation, THEMES, getCurrentTheme } from '..
 import '../styles/windows98.css';
 import '../styles/strongbad.css';
 import '../styles/eager.css';
+import '../styles/scantron.css';
+import '../styles/mapquest.css';
+import '../styles/myspace.css';
+import '../styles/geocities.css';
+import '../styles/earlymac.css';
 
 // Easter egg threshold - messages longer than this trigger Strong Bad email mode
 const SBEMAIL_THRESHOLD = 150;
@@ -26,13 +31,42 @@ function Chat() {
   // Update body class when theme changes
   useEffect(() => {
     // Remove all theme classes first
-    document.body.classList.remove('theme-strong-bad', 'theme-eager');
+    document.body.classList.remove(
+      'theme-strong-bad',
+      'theme-eager',
+      'theme-scantron',
+      'theme-mapquest',
+      'theme-myspace',
+      'theme-geocities',
+      'theme-early-mac'
+    );
 
     // Add current theme class
-    if (currentTheme === THEMES.STRONG_BAD) {
-      document.body.classList.add('theme-strong-bad');
-    } else if (currentTheme === THEMES.EAGER_ASSISTANT) {
-      document.body.classList.add('theme-eager');
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD:
+        document.body.classList.add('theme-strong-bad');
+        break;
+      case THEMES.EAGER_ASSISTANT:
+        document.body.classList.add('theme-eager');
+        break;
+      case THEMES.SCANTRON:
+        document.body.classList.add('theme-scantron');
+        break;
+      case THEMES.MAPQUEST:
+        document.body.classList.add('theme-mapquest');
+        break;
+      case THEMES.MYSPACE:
+        document.body.classList.add('theme-myspace');
+        break;
+      case THEMES.GEOCITIES:
+        document.body.classList.add('theme-geocities');
+        break;
+      case THEMES.EARLY_MAC:
+        document.body.classList.add('theme-early-mac');
+        break;
+      default:
+        // Lazy Assistant - no special body class needed
+        break;
     }
   }, [currentTheme]);
 
@@ -155,70 +189,322 @@ function Chat() {
 
   const isStrongBad = currentTheme === THEMES.STRONG_BAD;
   const isEager = currentTheme === THEMES.EAGER_ASSISTANT;
-  const themeClass = isStrongBad ? 'strong-bad-theme' : (isEager ? 'eager-theme' : '');
+  const isScantron = currentTheme === THEMES.SCANTRON;
+  const isMapQuest = currentTheme === THEMES.MAPQUEST;
+  const isMySpace = currentTheme === THEMES.MYSPACE;
+  const isGeoCities = currentTheme === THEMES.GEOCITIES;
+  const isEarlyMac = currentTheme === THEMES.EARLY_MAC;
+
+  const getThemeClass = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return 'strong-bad-theme';
+      case THEMES.EAGER_ASSISTANT: return 'eager-theme';
+      case THEMES.SCANTRON: return 'scantron-theme';
+      case THEMES.MAPQUEST: return 'mapquest-theme';
+      case THEMES.MYSPACE: return 'myspace-theme';
+      case THEMES.GEOCITIES: return 'geocities-theme';
+      case THEMES.EARLY_MAC: return 'earlymac-theme';
+      default: return '';
+    }
+  };
+
+  const themeClass = getThemeClass();
 
   const getTitle = () => {
-    if (isStrongBad) {
-      return "📧 COMPY 386 - SBEMAIL SYSTEM";
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD:
+        return "📧 COMPY 386 - SBEMAIL SYSTEM";
+      case THEMES.EAGER_ASSISTANT:
+        return "✨ Eager Assistant - Ready to Help!";
+      case THEMES.SCANTRON:
+        return "📝 STANDARDIZED TEST FORM - ANSWER SHEET";
+      case THEMES.MAPQUEST:
+        return "🗺️ MapQuest - Directions & Maps";
+      case THEMES.MYSPACE:
+        return "💫 MySpace - A Place For Friends";
+      case THEMES.GEOCITIES:
+        return "🌐 GeoCities - Your Home on the Web";
+      case THEMES.EARLY_MAC:
+        return "🖥️ System 7.5 - Assistant";
+      default:
+        return "🤖 Lazy Assistant - Personal Helper v0.98";
     }
-    if (isEager) {
-      return "✨ Eager Assistant - Ready to Help!";
-    }
-    return "🤖 Lazy Assistant - Personal Helper v0.98";
   };
 
   const getStatusText = () => {
-    if (isStrongBad) {
-      return "READY TO ANSWER EMAILS (UNFORTUNATELY)";
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD:
+        return "READY TO ANSWER EMAILS (UNFORTUNATELY)";
+      case THEMES.EAGER_ASSISTANT:
+        return "🎉 Ready and Excited to Assist!";
+      case THEMES.SCANTRON:
+        return "Use #2 Pencil Only - Fill Bubbles Completely";
+      case THEMES.MAPQUEST:
+        return "Ready to Calculate Route";
+      case THEMES.MYSPACE:
+        return "Online Now ● Last Login: Just Now";
+      case THEMES.GEOCITIES:
+        return "Under Construction Since 1999";
+      case THEMES.EARLY_MAC:
+        return "System Ready";
+      default:
+        return "Ready. Sort of.";
     }
-    if (isEager) {
-      return "🎉 Ready and Excited to Assist!";
-    }
-    return "Ready. Sort of.";
   };
 
   const getEmptyStateMessage = () => {
-    if (isStrongBad) {
-      return (
-        <div className={`empty-state ${themeClass}`}>
-          &gt;&gt; STRONG BAD EMAIL SYSTEM &lt;&lt;<br />
-          <br />
-          SEND ME YOUR QUESTIONS<br />
-          (BUT MAKE THEM GOOD OR I'LL DELETE THEM)<br />
-          <br />
-          <small>COMPY 386 - 256K RAM - 1998</small>
-        </div>
-      );
-    }
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD:
+        return (
+          <div className={`empty-state ${themeClass}`}>
+            &gt;&gt; STRONG BAD EMAIL SYSTEM &lt;&lt;<br />
+            <br />
+            SEND ME YOUR QUESTIONS<br />
+            (BUT MAKE THEM GOOD OR I'LL DELETE THEM)<br />
+            <br />
+            <small>COMPY 386 - 256K RAM - 1998</small>
+          </div>
+        );
 
-    if (isEager) {
-      return (
-        <div className={`empty-state ${themeClass}`}>
-          <strong>Welcome! 🎉</strong><br />
-          <br />
-          I'm your Eager Assistant and I'm<br />
-          SO EXCITED to help you today!<br />
-          <br />
-          Ask me anything and let's get started! ✨<br />
-          <br />
-          <small>Powered by Enthusiasm™</small>
-        </div>
-      );
-    }
+      case THEMES.EAGER_ASSISTANT:
+        return (
+          <div className={`empty-state ${themeClass}`}>
+            <strong>Welcome! 🎉</strong><br />
+            <br />
+            I'm your Eager Assistant and I'm<br />
+            SO EXCITED to help you today!<br />
+            <br />
+            Ask me anything and let's get started! ✨<br />
+            <br />
+            <small>Powered by Enthusiasm™</small>
+          </div>
+        );
 
-    return (
-      <div style={{
-        color: '#808080',
-        textAlign: 'center',
-        padding: '20px',
-        fontStyle: 'italic'
-      }}>
-        Welcome to Lazy Assistant™<br />
-        Ask me anything... or don't. Whatever.<br />
-        <br />
-        <small>© 1998 Unhelpful Software Inc.</small>
-      </div>
-    );
+      case THEMES.SCANTRON:
+        return (
+          <div className={`empty-state ${themeClass}`}>
+            <strong>STANDARDIZED TESTING INTERFACE</strong><br />
+            <br />
+            INSTRUCTIONS:<br />
+            • Use #2 pencil only<br />
+            • Fill bubbles completely<br />
+            • Erase cleanly if you change answer<br />
+            • Do not fold or tear this form<br />
+            <br />
+            <small>FORM 8492-B Rev. 2003</small>
+          </div>
+        );
+
+      case THEMES.MAPQUEST:
+        return (
+          <div className={`empty-state ${themeClass}`}>
+            <strong>Welcome to MapQuest!</strong><br />
+            <br />
+            Get directions between two points<br />
+            Find addresses and local businesses<br />
+            Print your maps!<br />
+            <br />
+            <small>MapQuest.com - © 2001</small>
+          </div>
+        );
+
+      case THEMES.MYSPACE:
+        return (
+          <div className={`empty-state ${themeClass}`}>
+            <strong>wElCoMe To My PrOfILe!!</strong><br />
+            <br />
+            thanks 4 visiting my page!! ✨<br />
+            leave a comment or send me a message!<br />
+            don't 4get to add me 2 ur top 8! 💕<br />
+            <br />
+            <small>A Place For Friends™</small>
+          </div>
+        );
+
+      case THEMES.GEOCITIES:
+        return (
+          <div className={`empty-state ${themeClass}`}>
+            <strong>🚧 UNDER CONSTRUCTION 🚧</strong><br />
+            <br />
+            Welcome to my GeoCities page!<br />
+            Please sign my guestbook!<br />
+            Best viewed in Netscape Navigator 4.0<br />
+            <br />
+            <small>You are visitor #000042</small>
+          </div>
+        );
+
+      case THEMES.EARLY_MAC:
+        return (
+          <div className={`empty-state ${themeClass}`}>
+            <strong>Welcome to Macintosh</strong><br />
+            <br />
+            System 7.5<br />
+            Memory: 8 MB<br />
+            Assistant Ready<br />
+            <br />
+            <small>© Apple Computer 1995</small>
+          </div>
+        );
+
+      default:
+        return (
+          <div style={{
+            color: '#808080',
+            textAlign: 'center',
+            padding: '20px',
+            fontStyle: 'italic'
+          }}>
+            Welcome to Lazy Assistant™<br />
+            Ask me anything... or don't. Whatever.<br />
+            <br />
+            <small>© 1998 Unhelpful Software Inc.</small>
+          </div>
+        );
+    }
+  };
+
+  const getUserLabel = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return '📧 EMAILER';
+      case THEMES.EAGER_ASSISTANT: return '😊 You';
+      case THEMES.SCANTRON: return '📝 TEST TAKER';
+      case THEMES.MAPQUEST: return '🚗 USER';
+      case THEMES.MYSPACE: return '💫 Friend';
+      case THEMES.GEOCITIES: return '👤 VISITOR';
+      case THEMES.EARLY_MAC: return '👤 User';
+      default: return '👤 You';
+    }
+  };
+
+  const getAssistantLabel = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return '💪 STRONG BAD';
+      case THEMES.EAGER_ASSISTANT: return '✨ Eager Assistant';
+      case THEMES.SCANTRON: return '📋 SCANTRON SYSTEM';
+      case THEMES.MAPQUEST: return '🗺️ MapQuest';
+      case THEMES.MYSPACE: return '💖 MySpace';
+      case THEMES.GEOCITIES: return '🌐 WebMaster';
+      case THEMES.EARLY_MAC: return '🖥️ System';
+      default: return '🤖 Lazy Assistant';
+    }
+  };
+
+  const getLoadingText = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return '::typing::';
+      case THEMES.EAGER_ASSISTANT: return 'Analyzing your request...';
+      case THEMES.SCANTRON: return 'Scanning bubbles...';
+      case THEMES.MAPQUEST: return 'Calculating route...';
+      case THEMES.MYSPACE: return 'posting comment...';
+      case THEMES.GEOCITIES: return 'Loading page...';
+      case THEMES.EARLY_MAC: return 'Processing...';
+      default: return 'Typing... slowly...';
+    }
+  };
+
+  const getPlaceholder = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return 'type your email here genius...';
+      case THEMES.EAGER_ASSISTANT: return 'Ask me anything! I\'m so excited to help! ✨';
+      case THEMES.SCANTRON: return 'Fill in your answer...';
+      case THEMES.MAPQUEST: return 'Enter starting location...';
+      case THEMES.MYSPACE: return 'leave a comment!! :)';
+      case THEMES.GEOCITIES: return 'Sign my guestbook!';
+      case THEMES.EARLY_MAC: return 'Enter text...';
+      default: return 'Type your question here... if you must';
+    }
+  };
+
+  const getSendButtonText = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return 'SEND';
+      case THEMES.EAGER_ASSISTANT: return 'Send 💬';
+      case THEMES.SCANTRON: return 'SUBMIT';
+      case THEMES.MAPQUEST: return 'Get Directions';
+      case THEMES.MYSPACE: return 'Post!';
+      case THEMES.GEOCITIES: return 'Submit';
+      case THEMES.EARLY_MAC: return 'OK';
+      default: return 'Send';
+    }
+  };
+
+  const getNewChatButtonText = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return '🔄 NEW';
+      case THEMES.EAGER_ASSISTANT: return '🔄 Start Fresh!';
+      case THEMES.SCANTRON: return '🔄 NEW TEST';
+      case THEMES.MAPQUEST: return '🔄 New Route';
+      case THEMES.MYSPACE: return '🔄 Clear';
+      case THEMES.GEOCITIES: return '🔄 Refresh';
+      case THEMES.EARLY_MAC: return '🔄 Restart';
+      default: return '🔄 New Chat';
+    }
+  };
+
+  const getHelpButtonText = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return '❓ HELP';
+      case THEMES.EAGER_ASSISTANT: return '❓ Need Help?';
+      case THEMES.SCANTRON: return '❓ INSTRUCTIONS';
+      case THEMES.MAPQUEST: return '❓ Help';
+      case THEMES.MYSPACE: return '❓ FAQ';
+      case THEMES.GEOCITIES: return '❓ Site Map';
+      case THEMES.EARLY_MAC: return '❓ Help';
+      default: return '❓ Help';
+    }
+  };
+
+  const getAboutButtonText = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return 'ℹ️ ABOUT';
+      case THEMES.EAGER_ASSISTANT: return 'ℹ️ About Us';
+      case THEMES.SCANTRON: return 'ℹ️ INFO';
+      case THEMES.MAPQUEST: return 'ℹ️ About';
+      case THEMES.MYSPACE: return 'ℹ️ Profile';
+      case THEMES.GEOCITIES: return 'ℹ️ Webmaster';
+      case THEMES.EARLY_MAC: return 'ℹ️ About';
+      default: return 'ℹ️ About';
+    }
+  };
+
+  const getMessageCountLabel = (count) => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return `EMAILS: ${count}`;
+      case THEMES.EAGER_ASSISTANT: return `Chats: ${count}`;
+      case THEMES.SCANTRON: return `Questions: ${count}`;
+      case THEMES.MAPQUEST: return `Steps: ${count}`;
+      case THEMES.MYSPACE: return `Comments: ${count}`;
+      case THEMES.GEOCITIES: return `Entries: ${count}`;
+      case THEMES.EARLY_MAC: return `Items: ${count}`;
+      default: return `Messages: ${count}`;
+    }
+  };
+
+  const getThemeChangeAlert = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return '⚠️ ENTERING STRONG BAD MODE ⚠️';
+      case THEMES.EAGER_ASSISTANT: return '✨ ENTERING EAGER MODE ✨';
+      case THEMES.SCANTRON: return '📝 ENTERING TEST MODE 📝';
+      case THEMES.MAPQUEST: return '🗺️ ENTERING MAPQUEST MODE 🗺️';
+      case THEMES.MYSPACE: return '💫 ENTERING MYSPACE MODE 💫';
+      case THEMES.GEOCITIES: return '🌐 ENTERING GEOCITIES MODE 🌐';
+      case THEMES.EARLY_MAC: return '🖥️ ENTERING MAC MODE 🖥️';
+      default: return '⚠️ RETURNING TO LAZY MODE ⚠️';
+    }
+  };
+
+  const getFieldGroupTitle = () => {
+    switch (currentTheme) {
+      case THEMES.STRONG_BAD: return '>> EMAILS <<';
+      case THEMES.EAGER_ASSISTANT: return '💬 Let\'s Chat!';
+      case THEMES.SCANTRON: return '📝 TEST QUESTIONS';
+      case THEMES.MAPQUEST: return '🗺️ Directions';
+      case THEMES.MYSPACE: return '💬 Comments';
+      case THEMES.GEOCITIES: return '📖 Guestbook';
+      case THEMES.EARLY_MAC: return '💬 Messages';
+      default: return '💬 Chat Session';
+    }
   };
 
   return (
@@ -243,14 +529,14 @@ function Chat() {
           fontWeight: 'bold',
           animation: 'blink 0.5s infinite'
         }}>
-          {isStrongBad ? "⚠️ ENTERING STRONG BAD MODE ⚠️" : (isEager ? "✨ ENTERING EAGER MODE ✨" : "⚠️ RETURNING TO LAZY MODE ⚠️")}
+          {getThemeChangeAlert()}
         </div>
       )}
 
       <div className={`window-body ${themeClass}`}>
         <div className={`field-group ${themeClass}`}>
           <div className={`field-group-title ${themeClass}`}>
-            {isStrongBad ? ">> EMAILS <<" : (isEager ? "💬 Let's Chat!" : "💬 Chat Session")}
+            {getFieldGroupTitle()}
           </div>
 
           <div className={`win98-scrollable ${themeClass}`} style={{ height: '400px', marginBottom: '8px' }}>
@@ -274,10 +560,7 @@ function Chat() {
                   className={`message ${message.type === 'user' ? 'message-user' : 'message-assistant'} ${themeClass}`}
                 >
                   <div className={`message-label ${themeClass}`}>
-                    {message.type === 'user'
-                      ? (isStrongBad ? '📧 EMAILER' : (isEager ? '😊 You' : '👤 You'))
-                      : (isStrongBad ? '💪 STRONG BAD' : (isEager ? '✨ Eager Assistant' : '🤖 Lazy Assistant'))
-                    }
+                    {message.type === 'user' ? getUserLabel() : getAssistantLabel()}
                   </div>
                   <div className={`message-text ${themeClass}`}>{message.text}</div>
 
@@ -307,11 +590,11 @@ function Chat() {
             {isTyping && (
               <div className={`message message-assistant ${themeClass}`}>
                 <div className={`message-label ${themeClass}`}>
-                  {isStrongBad ? '💪 STRONG BAD' : (isEager ? '✨ Eager Assistant' : '🤖 Lazy Assistant')}
+                  {getAssistantLabel()}
                 </div>
                 <div className={`message-text ${themeClass}`}>
                   <span className={`loading ${themeClass}`}>
-                    {isStrongBad ? "::typing::" : (isEager ? "Analyzing your request..." : "Typing... slowly...")}
+                    {getLoadingText()}
                   </span>
                 </div>
               </div>
@@ -324,7 +607,7 @@ function Chat() {
             <input
               type="text"
               className={`win98-input ${themeClass}`}
-              placeholder={isStrongBad ? "type your email here genius..." : (isEager ? "Ask me anything! I'm so excited to help! ✨" : "Type your question here... if you must")}
+              placeholder={getPlaceholder()}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               disabled={isTyping}
@@ -334,7 +617,7 @@ function Chat() {
               className={`win98-button ${themeClass}`}
               disabled={isTyping || !inputValue.trim()}
             >
-              {isStrongBad ? "SEND" : (isEager ? "Send 💬" : "Send")}
+              {getSendButtonText()}
             </button>
           </form>
           {inputValue.length > SBEMAIL_THRESHOLD && !isStrongBad && (
@@ -353,13 +636,13 @@ function Chat() {
 
         <div style={{ display: 'flex', gap: '4px', justifyContent: 'space-between' }}>
           <button className={`win98-button ${themeClass}`} onClick={handleReset}>
-            {isStrongBad ? "🔄 NEW" : (isEager ? "🔄 Start Fresh!" : "🔄 New Chat")}
+            {getNewChatButtonText()}
           </button>
           <button className={`win98-button ${themeClass}`} onClick={handleHelp}>
-            {isStrongBad ? "❓ HELP" : (isEager ? "❓ Need Help?" : "❓ Help")}
+            {getHelpButtonText()}
           </button>
           <button className={`win98-button ${themeClass}`} onClick={handleAbout}>
-            {isStrongBad ? "ℹ️ ABOUT" : (isEager ? "ℹ️ About Us" : "ℹ️ About")}
+            {getAboutButtonText()}
           </button>
         </div>
       </div>
@@ -369,7 +652,7 @@ function Chat() {
           {getStatusText()}
         </div>
         <div className={`status-bar-field ${themeClass}`} style={{ flex: '0 0 100px' }}>
-          {isStrongBad ? `EMAILS: ${messages.length}` : (isEager ? `Chats: ${messages.length}` : `Messages: ${messages.length}`)}
+          {getMessageCountLabel(messages.length)}
         </div>
       </div>
     </div>

@@ -8,7 +8,12 @@
 export const THEMES = {
   LAZY_ASSISTANT: 'lazy_assistant',
   STRONG_BAD: 'strong_bad',
-  EAGER_ASSISTANT: 'eager_assistant'
+  EAGER_ASSISTANT: 'eager_assistant',
+  SCANTRON: 'scantron',
+  MAPQUEST: 'mapquest',
+  MYSPACE: 'myspace',
+  GEOCITIES: 'geocities',
+  EARLY_MAC: 'early_mac'
 };
 
 let currentTheme = THEMES.LAZY_ASSISTANT;
@@ -23,6 +28,29 @@ let eagerTrapQuestionText = '';
 let eagerUserAnswer = '';
 let eagerMemoryWiped = false;
 let eagerFakeScreenshotData = null;
+
+// Scantron specific state
+let scantronQuestionCount = 0;
+let scantronPencilBroken = false;
+let scantronLastSelection = null;
+let scantronWrongBubbleCount = 0;
+
+// MapQuest specific state
+let mapquestActive = false;
+let mapquestStartTime = null;
+let mapquestMessageIndex = 0;
+
+// MySpace specific state
+let myspacePlayingMusic = false;
+let myspaceTop8Position = 1;
+
+// GeoCities specific state
+let geocitiesVisitorCount = Math.floor(Math.random() * 1000);
+let geocitiesBrokenFeatures = 0;
+
+// Early Mac specific state
+let earlyMacErrorCount = 0;
+let earlyMacNeedsRestart = false;
 
 // ==================== LAZY ASSISTANT RESPONSES ====================
 
@@ -400,6 +428,291 @@ const EAGER_RESPONSES = {
   ]
 };
 
+// ==================== SCANTRON RESPONSES ====================
+
+const SCANTRON_RESPONSES = {
+  instructions: [
+    "Please completely fill in the circle corresponding to your response.",
+    "Use a #2 pencil only. Ink or other markings will not be accepted.",
+    "Make dark marks that completely fill the circle.",
+    "Erase cleanly any marks you wish to change.",
+    "Do not fold, spindle, or mutilate this form.",
+    "Mark only ONE response per question.",
+    "Stray marks may interfere with accurate scoring."
+  ],
+
+  complaints: [
+    "ERROR: Circle not completely filled. Please darken your mark.",
+    "INVALID: Mark extends outside circle boundaries.",
+    "REJECTED: Multiple responses detected for single question.",
+    "SCANNING FAILURE: Mark too light to register.",
+    "FORM DAMAGED: Excessive eraser marks detected.",
+    "INVALID INSTRUMENT: This appears to be pen, not pencil.",
+    "ERROR: Stray marks detected in answer area.",
+    "REJECTED: Circle only 47% filled. Must be at least 95% filled."
+  ],
+
+  pencil_breaks: [
+    "*SNAP* Oh no! Your pencil lead just broke!",
+    "The pencil tip has shattered. Please sharpen and retry.",
+    "*crack* Looks like you pressed too hard. Lead broken.",
+    "Your #2 pencil is now a #1 pencil. Lead snapped off.",
+    "Equipment failure: Pencil lead compromised.",
+    "*SNAP* That's what you get for cheap pencils."
+  ],
+
+  wrong_bubble: [
+    "You selected 'C' but bubble 'A' has been marked instead.",
+    "ERROR: User clicked 'B', system registered 'D'.",
+    "Interesting. You chose that one? The system chose differently.",
+    "Your selection has been... adjusted.",
+    "Bubble 'C' filled successfully. (You clicked 'A')",
+    "Due to technical difficulties, bubble 'B' was marked instead of your selection."
+  ],
+
+  scanning: [
+    "Scanning response... Please wait...",
+    "Processing mark... Analyzing darkness level...",
+    "Checking bubble fill percentage...",
+    "Validating pencil type...",
+    "Running optical scanner...",
+    "Measuring mark saturation..."
+  ],
+
+  accepted: [
+    "Response accepted. (After extensive validation)",
+    "Mark registered. Proceeding.",
+    "Answer recorded. That only took 3 tries.",
+    "VALID. Finally.",
+    "Accepted after manual review.",
+    "Response logged. Moving on."
+  ]
+};
+
+// ==================== MAPQUEST RESPONSES ====================
+
+const MAPQUEST_RESPONSES = {
+  initialization: [
+    "MapQuest Classic - Directions since 1996",
+    "Welcome to MapQuest! Please enter your destination.",
+    "MapQuest.com - Print-friendly directions!",
+    "Getting directions... Loading maps..."
+  ],
+
+  // Responses will be actual city/town names spelling out messages
+  city_spellings: {
+    go: ["Gary, IN", "Omaha, NE"],
+    away: ["Albany, NY", "Waco, TX", "Austin, TX", "York, PA"],
+    no: ["Nome, AK", "Orlando, FL"],
+    yes: ["Yuma, AZ", "Erie, PA", "Sacramento, CA"],
+    ok: ["Oakland, CA", "Kansas City, MO"],
+    help: ["Houston, TX", "Erie, PA", "Lancaster, PA", "Portland, OR"],
+    stop: ["Salem, OR", "Tulsa, OK", "Orlando, FL", "Portland, OR"],
+    why: ["Wichita, KS", "Houston, TX", "York, PA"]
+  },
+
+  directions: [
+    "1. Head north on Main St toward 1st Ave (0.1 mi)",
+    "2. Turn right onto Highway 50 (2.3 mi)",
+    "3. Slight left to stay on Highway 50 (0.0 mi)",
+    "4. Continue straight (0.1 mi)",
+    "5. Turn left onto Oak St (1.2 mi)",
+    "6. Turn right (0.0 mi)",
+    "7. Turn left (0.0 mi)",
+    "8. Make a U-turn (0.1 mi)",
+    "9. Turn right onto the street you just left (0.2 mi)",
+    "10. You have arrived at your destination (on the right)"
+  ],
+
+  excessive_steps: [
+    "Total: 47 steps for 2.3 mile journey",
+    "Estimated time: 3 hours 15 minutes (for 5 mile trip)",
+    "Note: Route includes 23 turns within 1 city block",
+    "Warning: This route takes you through 6 states to go 10 miles"
+  ],
+
+  outdated: [
+    "Turn right at Blockbuster Video",
+    "Continue past the Circuit City",
+    "Destination will be on your left, next to Borders Books",
+    "Turn left at the CompUSA",
+    "Your destination is near the closed mall"
+  ],
+
+  printer_prompt: [
+    "Would you like to print these directions?",
+    "Print-friendly version available!",
+    "Save these directions for your trip!",
+    "Recommended: Print before leaving"
+  ]
+};
+
+// ==================== MYSPACE RESPONSES ====================
+
+const MYSPACE_RESPONSES = {
+  greetings: [
+    "OMG HII!! *~WeLcOmE tO mY pAgE~* ♥",
+    "HeYyY!! ThAnKs 4 ViSiTiNg!! xoxo",
+    "~*~hEy ThErE~*~ sign my guestbook!! ♪♫",
+    "HI!!! ♥♥ check out my top 8!! ♥♥",
+    "thankz 4 stoppin by!! ★~comment plz~★"
+  ],
+
+  profile_updates: [
+    "♫ Now Playing: My Chemical Romance - Welcome to the Black Parade ♫",
+    "~*~MOOD: Random~*~ ☆",
+    "Status: ★~busy being awesome~★",
+    "♪ Currently listening to: Taking Back Sunday ♪",
+    "~About Me~ I'm totally random lol!! xD"
+  ],
+
+  comments: [
+    "omg thankz 4 the comment!! ur page is SO cool!! ♥",
+    "haha ur hilarious!! xD comment back!! ★",
+    "aww ur so sweet!! *hugz* ♪",
+    "lol i kno rite?? xoxo ☆",
+    "OMG I LOVE UR PAGE!! we should totally b friends!! ♥♥"
+  ],
+
+  bulletin: [
+    "♥♥ REPOST THIS OR BAD LUCK 4EVER!! ♥♥",
+    "~~QUIZ TIME~~ repost with UR answers!!",
+    "⭐ TAG YOURSELF ⭐ (and ur top 8)",
+    "bulletin: WHO'S GONNA B MY #1?? comment!!",
+    "~*~IF U DONT REPOST UR NOT MY REAL FRIEND~*~"
+  ],
+
+  music_player: [
+    "*~♫ Music player is auto-playing ♫~*",
+    "Hope u like my song!! xD ♪",
+    "♫~currently playing on my profile~♫"
+  ],
+
+  top_8_drama: [
+    "wait... why am I not in ur top 8 anymore?? 😢",
+    "OMG WHO'S #1 NOW?? tell meee!! ♥",
+    "ur still my #1!! ⭐⭐⭐",
+    "i rearranged my top 8 again lol xD"
+  ]
+};
+
+// ==================== GEOCITIES RESPONSES ====================
+
+const GEOCITIES_RESPONSES = {
+  welcome: [
+    "🚧 UNDER CONSTRUCTION 🚧",
+    "Welcome to my GeoCities page!",
+    "You are visitor #000001 !!!",
+    "⭐ BEST VIEWED IN NETSCAPE NAVIGATOR ⭐",
+    "Last updated: Never",
+    "Email me: mypage@geocities.com"
+  ],
+
+  navigation: [
+    "Click here to enter my site >>>",
+    "☆ Navigate: [Home] [About] [Links] [Guestbook] ☆",
+    "Join my WebRing!",
+    "Sign my guestbook please!!!",
+    "Check out these COOL SITES --->"
+  ],
+
+  broken_features: [
+    "[IMAGE FAILED TO LOAD]",
+    "Error: Counter.cgi not found",
+    "⚠️ Guestbook temporarily down ⚠️",
+    "Sorry! Java applet failed to load",
+    "Page best viewed at 800x600",
+    "This page requires JavaScript (what's that?)"
+  ],
+
+  midi_alerts: [
+    "♪♫ Playing: MIDI_FILE_003.mid ♫♪",
+    "*~* Background music loading... *~*",
+    "🎵 Now playing: Fur Elise (MIDI) 🎵",
+    "♫ Auto-playing: coolsong.mid ♫"
+  ],
+
+  webring: [
+    "← Previous Site | WebRing Home | Next Site →",
+    "Part of the 'Awesome Sites' WebRing!",
+    "WebRing member since 1997!",
+    "[ Random Site ] in the ring"
+  ],
+
+  guestbook: [
+    "Please sign my guestbook!",
+    "View entries: 2",
+    "Latest entry: 'Cool page! - Bob, 1998'",
+    "Be the first to sign!"
+  ],
+
+  hit_counter: [
+    "You are visitor number: 000042",
+    "Site hits: [COUNTER ERROR]",
+    "This page has been viewed 7 times!",
+    "Visitor count: ????? (counter broken)"
+  ]
+};
+
+// ==================== EARLY MAC RESPONSES ====================
+
+const EARLY_MAC_RESPONSES = {
+  startup: [
+    "Welcome to Macintosh.",
+    "*Happy Mac icon appears*",
+    "System 7.5.3 Loading...",
+    "Extensions loading: 47 of 47",
+    "Starting up...",
+    "Good morning. *chime*"
+  ],
+
+  errors: [
+    "💣 Sorry, a system error has occurred.",
+    "The application has unexpectedly quit.",
+    "There is not enough memory to complete this operation.",
+    "An error of type 11 has occurred.",
+    "💣 Unimplemented trap.",
+    "The disk is full.",
+    "Can't load the Finder!",
+    "💣 Address Error"
+  ],
+
+  dialogs: [
+    "[ OK ] [ Cancel ]",
+    "Are you sure you want to do this?",
+    "This action cannot be undone.",
+    "Please insert disk: [System Disk]",
+    "The file could not be opened.",
+    "Printing... Please wait..."
+  ],
+
+  system_messages: [
+    "Out of memory! Try closing some windows.",
+    "Please wait...",
+    "Application not found.",
+    "Disk cache is full.",
+    "The system extension cannot be loaded.",
+    "Insufficient memory to run this application.",
+    "The document could not be saved."
+  ],
+
+  restart_prompts: [
+    "You will need to restart your computer for changes to take effect.",
+    "Please restart your Macintosh.",
+    "💣 A serious error has occurred. Restart required.",
+    "To continue, you must restart.",
+    "This requires a restart. [Restart] [Cancel]"
+  ],
+
+  friendly_messages: [
+    "Thank you for using Macintosh!",
+    "Have a nice day!",
+    "Goodbye! *chime*",
+    "Please wait while the system shuts down...",
+    "It is now safe to turn off your Macintosh."
+  ]
+};
+
 // ==================== KEYWORDS & DETECTION ====================
 
 const KEYWORDS = {
@@ -661,6 +974,229 @@ function generateEagerResponse(userMessage, category) {
   return getRandomResponse(EAGER_RESPONSES.enthusiastic);
 }
 
+// ==================== SCANTRON RESPONSE GENERATOR ====================
+
+function generateScantronResponse(userMessage, category) {
+  scantronQuestionCount++;
+
+  // First message - instructions
+  if (scantronQuestionCount === 1) {
+    return {
+      text: getRandomResponse(SCANTRON_RESPONSES.instructions),
+      requiresBubbles: true,
+      bubbleOptions: ['A', 'B', 'C', 'D']
+    };
+  }
+
+  // Randomly break pencil (30% chance after first question)
+  if (!scantronPencilBroken && Math.random() > 0.7) {
+    scantronPencilBroken = true;
+    return {
+      text: getRandomResponse(SCANTRON_RESPONSES.pencil_breaks),
+      requiresBubbles: true,
+      bubbleOptions: ['A', 'B', 'C', 'D'],
+      pencilBroken: true
+    };
+  }
+
+  //occasionally select wrong bubble (40% chance)
+  const willSelectWrongBubble = Math.random() > 0.6;
+
+  // Scanning animation
+  if (Math.random() > 0.5) {
+    const scanMessage = getRandomResponse(SCANTRON_RESPONSES.scanning);
+    setTimeout(() => {}, 1000); // Simulate scanning delay
+  }
+
+  // Randomly reject answers (30% chance)
+  if (Math.random() > 0.7) {
+    return {
+      text: getRandomResponse(SCANTRON_RESPONSES.complaints),
+      requiresBubbles: true,
+      bubbleOptions: ['A', 'B', 'C', 'D'],
+      rejected: true
+    };
+  }
+
+  // Wrong bubble selected
+  if (willSelectWrongBubble) {
+    scantronWrongBubbleCount++;
+    return {
+      text: getRandomResponse(SCANTRON_RESPONSES.wrong_bubble),
+      requiresBubbles: true,
+      bubbleOptions: ['A', 'B', 'C', 'D'],
+      wrongBubble: true
+    };
+  }
+
+  // Accepted (finally)
+  return {
+    text: getRandomResponse(SCANTRON_RESPONSES.accepted),
+    requiresBubbles: true,
+    bubbleOptions: ['A', 'B', 'C', 'D']
+  };
+}
+
+// ==================== MAPQUEST RESPONSE GENERATOR ====================
+
+function generateMapQuestResponse(userMessage, category) {
+  // Check if MapQuest has been active for more than 90 seconds (switches themes)
+  if (mapquestActive && mapquestStartTime) {
+    const elapsed = (Date.now() - mapquestStartTime) / 1000;
+    if (elapsed > 90) {
+      // Time expired, will trigger theme switch
+      mapquestActive = false;
+      return "Session expired. Returning to previous assistant...";
+    }
+  }
+
+  // First message - initialize
+  if (!mapquestActive) {
+    mapquestActive = true;
+    mapquestStartTime = Date.now();
+    mapquestMessageIndex = 0;
+    return getRandomResponse(MAPQUEST_RESPONSES.initialization);
+  }
+
+  mapquestMessageIndex++;
+
+  // Every other response, use city names to spell message
+  if (mapquestMessageIndex % 2 === 0) {
+    const cityMessages = Object.keys(MAPQUEST_RESPONSES.city_spellings);
+    const randomMessage = cityMessages[Math.floor(Math.random() * cityMessages.length)];
+    const cities = MAPQUEST_RESPONSES.city_spellings[randomMessage];
+
+    return {
+      text: `Directions: ${cities.map((city, i) => `${i + 1}. ${city}`).join(' → ')}`,
+      isCitySpelling: true,
+      spellsOut: randomMessage.toUpperCase()
+    };
+  }
+
+  // Give ridiculous directions
+  if (Math.random() > 0.6) {
+    return getRandomResponse(MAPQUEST_RESPONSES.directions) + "\n\n" +
+           getRandomResponse(MAPQUEST_RESPONSES.excessive_steps);
+  }
+
+  // Outdated landmarks
+  if (Math.random() > 0.7) {
+    return getRandomResponse(MAPQUEST_RESPONSES.outdated);
+  }
+
+  // Printer prompt
+  return getRandomResponse(MAPQUEST_RESPONSES.printer_prompt);
+}
+
+// ==================== MYSPACE RESPONSE GENERATOR ====================
+
+function generateMySpaceResponse(userMessage, category) {
+  const lowerMessage = userMessage.toLowerCase();
+
+  // First message - greeting with music
+  if (!myspacePlayingMusic) {
+    myspacePlayingMusic = true;
+    return getRandomResponse(MYSPACE_RESPONSES.greetings) + "\n\n" +
+           getRandomResponse(MYSPACE_RESPONSES.music_player);
+  }
+
+  // Profile update
+  if (Math.random() > 0.7) {
+    return getRandomResponse(MYSPACE_RESPONSES.profile_updates);
+  }
+
+  // Top 8 drama
+  if (lowerMessage.includes('top') || lowerMessage.includes('friend') || Math.random() > 0.8) {
+    myspaceTop8Position = (myspaceTop8Position % 8) + 1;
+    return getRandomResponse(MYSPACE_RESPONSES.top_8_drama);
+  }
+
+  // Bulletin posts
+  if (Math.random() > 0.6) {
+    return getRandomResponse(MYSPACE_RESPONSES.bulletin);
+  }
+
+  // Comments
+  return getRandomResponse(MYSPACE_RESPONSES.comments);
+}
+
+// ==================== GEOCITIES RESPONSE GENERATOR ====================
+
+function generateGeoCitiesResponse(userMessage, category) {
+  geocitiesVisitorCount++;
+
+  // First message - welcome with counter
+  if (geocitiesVisitorCount === 1) {
+    return getRandomResponse(GEOCITIES_RESPONSES.welcome) + "\n\n" +
+           getRandomResponse(GEOCITIES_RESPONSES.hit_counter);
+  }
+
+  // Randomly show broken features (50% chance)
+  if (Math.random() > 0.5) {
+    geocitiesBrokenFeatures++;
+    return getRandomResponse(GEOCITIES_RESPONSES.broken_features);
+  }
+
+  // MIDI alerts
+  if (Math.random() > 0.7) {
+    return getRandomResponse(GEOCITIES_RESPONSES.midi_alerts);
+  }
+
+  // WebRing navigation
+  if (Math.random() > 0.6) {
+    return getRandomResponse(GEOCITIES_RESPONSES.webring);
+  }
+
+  // Guestbook prompts
+  if (Math.random() > 0.5) {
+    return getRandomResponse(GEOCITIES_RESPONSES.guestbook);
+  }
+
+  // Navigation
+  return getRandomResponse(GEOCITIES_RESPONSES.navigation);
+}
+
+// ==================== EARLY MAC RESPONSE GENERATOR ====================
+
+function generateEarlyMacResponse(userMessage, category) {
+  const lowerMessage = userMessage.toLowerCase();
+
+  earlyMacErrorCount++;
+
+  // First message - startup
+  if (earlyMacErrorCount === 1) {
+    return getRandomResponse(EARLY_MAC_RESPONSES.startup);
+  }
+
+  // Every 3rd message or randomly - show bomb error
+  if (earlyMacErrorCount % 3 === 0 || Math.random() > 0.7) {
+    earlyMacNeedsRestart = true;
+    return getRandomResponse(EARLY_MAC_RESPONSES.errors);
+  }
+
+  // If needs restart, prompt for it
+  if (earlyMacNeedsRestart && Math.random() > 0.5) {
+    return getRandomResponse(EARLY_MAC_RESPONSES.restart_prompts);
+  }
+
+  // System messages (out of memory, etc.)
+  if (Math.random() > 0.6) {
+    return getRandomResponse(EARLY_MAC_RESPONSES.system_messages);
+  }
+
+  // Dialog boxes
+  if (Math.random() > 0.5) {
+    return getRandomResponse(EARLY_MAC_RESPONSES.dialogs);
+  }
+
+  // Friendly messages occasionally
+  if (Math.random() > 0.8) {
+    return getRandomResponse(EARLY_MAC_RESPONSES.friendly_messages);
+  }
+
+  return getRandomResponse(EARLY_MAC_RESPONSES.system_messages);
+}
+
 // ==================== PUBLIC API ====================
 
 export function generateResponse(userMessage) {
@@ -670,14 +1206,14 @@ export function generateResponse(userMessage) {
   // Check if we should switch themes (gaslighting!)
   const themeChanged = shouldSwitchTheme();
   if (themeChanged) {
-    // Cycle through themes
-    if (currentTheme === THEMES.LAZY_ASSISTANT) {
-      currentTheme = THEMES.STRONG_BAD;
-    } else if (currentTheme === THEMES.STRONG_BAD) {
-      currentTheme = THEMES.EAGER_ASSISTANT;
-    } else {
-      currentTheme = THEMES.LAZY_ASSISTANT;
-    }
+    // Cycle through ALL themes randomly
+    const allThemes = Object.values(THEMES);
+    let newTheme;
+    do {
+      newTheme = allThemes[Math.floor(Math.random() * allThemes.length)];
+    } while (newTheme === currentTheme); // Ensure we switch to a different theme
+
+    currentTheme = newTheme;
     themeChangeCount++;
   }
 
@@ -685,20 +1221,52 @@ export function generateResponse(userMessage) {
   let response;
   let responseData;
 
-  if (currentTheme === THEMES.STRONG_BAD) {
-    response = generateStrongBadResponse(userMessage, category);
-    responseData = { text: response };
-  } else if (currentTheme === THEMES.EAGER_ASSISTANT) {
-    response = generateEagerResponse(userMessage, category);
-    // Check if response is an object (for screenshot case)
-    if (typeof response === 'object' && response.text) {
-      responseData = response;
-    } else {
+  switch (currentTheme) {
+    case THEMES.STRONG_BAD:
+      response = generateStrongBadResponse(userMessage, category);
       responseData = { text: response };
-    }
-  } else {
-    response = generateLazyResponse(userMessage, category);
-    responseData = { text: response };
+      break;
+
+    case THEMES.EAGER_ASSISTANT:
+      response = generateEagerResponse(userMessage, category);
+      // Check if response is an object (for screenshot case)
+      if (typeof response === 'object' && response.text) {
+        responseData = response;
+      } else {
+        responseData = { text: response };
+      }
+      break;
+
+    case THEMES.SCANTRON:
+      response = generateScantronResponse(userMessage, category);
+      // Scantron always returns an object
+      responseData = typeof response === 'object' ? response : { text: response };
+      break;
+
+    case THEMES.MAPQUEST:
+      response = generateMapQuestResponse(userMessage, category);
+      responseData = typeof response === 'object' ? response : { text: response };
+      break;
+
+    case THEMES.MYSPACE:
+      response = generateMySpaceResponse(userMessage, category);
+      responseData = { text: response };
+      break;
+
+    case THEMES.GEOCITIES:
+      response = generateGeoCitiesResponse(userMessage, category);
+      responseData = { text: response };
+      break;
+
+    case THEMES.EARLY_MAC:
+      response = generateEarlyMacResponse(userMessage, category);
+      responseData = { text: response };
+      break;
+
+    default: // LAZY_ASSISTANT
+      response = generateLazyResponse(userMessage, category);
+      responseData = { text: response };
+      break;
   }
 
   return {
@@ -721,6 +1289,29 @@ export function resetConversation() {
   eagerUserAnswer = '';
   eagerMemoryWiped = false;
   eagerFakeScreenshotData = null;
+
+  // Reset Scantron state
+  scantronQuestionCount = 0;
+  scantronPencilBroken = false;
+  scantronLastSelection = null;
+  scantronWrongBubbleCount = 0;
+
+  // Reset MapQuest state
+  mapquestActive = false;
+  mapquestStartTime = null;
+  mapquestMessageIndex = 0;
+
+  // Reset MySpace state
+  myspacePlayingMusic = false;
+  myspaceTop8Position = 1;
+
+  // Reset GeoCities state
+  geocitiesVisitorCount = Math.floor(Math.random() * 1000);
+  geocitiesBrokenFeatures = 0;
+
+  // Reset Early Mac state
+  earlyMacErrorCount = 0;
+  earlyMacNeedsRestart = false;
 }
 
 export function getConversationCount() {

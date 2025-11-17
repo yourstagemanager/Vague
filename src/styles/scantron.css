@@ -1,0 +1,479 @@
+/**
+ * Scantron Test Form Theme
+ * Early 2000s standardized testing aesthetic
+ * Beige paper, #2 pencil marks, bubble filling anxiety
+ */
+
+:root {
+  --scantron-paper: #F5E6D3;
+  --scantron-lines: #0066CC;
+  --scantron-text: #000000;
+  --scantron-bubble: #FFFFFF;
+  --scantron-bubble-border: #000000;
+  --scantron-filled: #1a1a1a;
+  --scantron-partial: #666666;
+  --scantron-red-reject: #CC0000;
+  --scantron-green-accept: #006600;
+  --scantron-warning: #FF6600;
+  --scantron-instruction-blue: #003366;
+}
+
+/* Scantron Desktop Background */
+body.theme-scantron {
+  background: #E0D5C7;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 35px,
+      #C0B5A7 35px,
+      #C0B5A7 36px
+    );
+  font-family: 'Courier New', 'Courier', monospace;
+}
+
+/* Scantron Form Window */
+.window.scantron-theme {
+  background: var(--scantron-paper);
+  border: 3px solid var(--scantron-bubble-border);
+  border-left: 20px solid var(--scantron-bubble-border);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  max-width: 850px;
+  margin: 20px auto;
+  padding: 0;
+  position: relative;
+}
+
+/* Black timing marks on left edge */
+.window.scantron-theme::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #000 0px,
+      #000 10px,
+      transparent 10px,
+      transparent 30px
+    );
+}
+
+/* Title Bar - Form Header */
+.title-bar.scantron-theme {
+  background: var(--scantron-instruction-blue);
+  padding: 12px 20px;
+  border-bottom: 3px double var(--scantron-bubble-border);
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+.title-bar-text.scantron-theme {
+  color: #FFFFFF;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Form Body */
+.window-body.scantron-theme {
+  background: var(--scantron-paper);
+  padding: 30px 40px;
+  color: var(--scantron-text);
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.8;
+  min-height: 500px;
+  position: relative;
+}
+
+/* Instructions Box */
+.scantron-instructions {
+  border: 2px solid var(--scantron-instruction-blue);
+  background: rgba(0, 51, 102, 0.05);
+  padding: 15px;
+  margin-bottom: 20px;
+  font-family: 'Arial', sans-serif;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.scantron-instructions strong {
+  color: var(--scantron-instruction-blue);
+  text-transform: uppercase;
+}
+
+/* Field Group - Question container */
+.field-group.scantron-theme {
+  border: 2px solid var(--scantron-bubble-border);
+  background: var(--scantron-paper);
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.field-group-title.scantron-theme {
+  color: var(--scantron-instruction-blue);
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'Arial', sans-serif;
+  border-bottom: 2px solid var(--scantron-lines);
+  padding-bottom: 5px;
+}
+
+/* Scrollable area - Test questions */
+.win98-scrollable.scantron-theme {
+  background: var(--scantron-paper);
+  border: 2px solid var(--scantron-bubble-border);
+  padding: 15px;
+  color: var(--scantron-text);
+  font-family: 'Courier New', monospace;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar */
+.win98-scrollable.scantron-theme::-webkit-scrollbar {
+  width: 16px;
+  background: #D0C5B7;
+}
+
+.win98-scrollable.scantron-theme::-webkit-scrollbar-track {
+  background: var(--scantron-paper);
+  border: 1px solid var(--scantron-bubble-border);
+}
+
+.win98-scrollable.scantron-theme::-webkit-scrollbar-thumb {
+  background: var(--scantron-bubble-border);
+  border: 2px solid var(--scantron-paper);
+}
+
+/* Messages - Question format */
+.message.scantron-theme {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-left: 5px solid var(--scantron-lines);
+  background: rgba(255, 255, 255, 0.5);
+  font-family: 'Courier New', monospace;
+}
+
+.message-user.scantron-theme {
+  border-left-color: var(--scantron-instruction-blue);
+  background: rgba(0, 51, 102, 0.05);
+}
+
+.message-assistant.scantron-theme {
+  border-left-color: var(--scantron-red-reject);
+  background: rgba(204, 0, 0, 0.03);
+}
+
+.message-label.scantron-theme {
+  color: var(--scantron-instruction-blue);
+  font-weight: bold;
+  font-size: 11px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Arial', sans-serif;
+}
+
+.message-text.scantron-theme {
+  color: var(--scantron-text);
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Bubble Answer Section */
+.scantron-bubbles {
+  display: flex;
+  gap: 15px;
+  margin: 15px 0;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px dashed var(--scantron-bubble-border);
+  justify-content: center;
+  align-items: center;
+}
+
+.scantron-bubble {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--scantron-bubble-border);
+  border-radius: 50%;
+  background: var(--scantron-bubble);
+  cursor: crosshair;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  transition: all 0.3s;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scantron-bubble:hover {
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
+}
+
+.scantron-bubble.filled {
+  background:
+    radial-gradient(
+      circle,
+      var(--scantron-filled) 0%,
+      var(--scantron-filled) 70%,
+      var(--scantron-partial) 70%,
+      var(--scantron-partial) 100%
+    );
+  color: white;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+.scantron-bubble.partial {
+  background:
+    radial-gradient(
+      circle,
+      var(--scantron-partial) 0%,
+      var(--scantron-partial) 40%,
+      transparent 40%
+    );
+}
+
+.scantron-bubble.wrong {
+  animation: bubble-reject 0.5s ease;
+  border-color: var(--scantron-red-reject);
+}
+
+@keyframes bubble-reject {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Broken pencil indicator */
+.pencil-broken-warning {
+  background: var(--scantron-red-reject);
+  color: white;
+  padding: 12px;
+  margin: 15px 0;
+  border: 3px solid darkred;
+  text-align: center;
+  font-weight: bold;
+  font-family: 'Arial', sans-serif;
+  animation: blink-warning 1s infinite;
+}
+
+@keyframes blink-warning {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.7; }
+}
+
+/* Scanning feedback */
+.scanning-feedback {
+  border: 3px solid var(--scantron-red-reject);
+  background: rgba(204, 0, 0, 0.1);
+  padding: 15px;
+  margin: 15px 0;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  animation: scan-line 2s linear;
+}
+
+.scanning-feedback.accepted {
+  border-color: var(--scantron-green-accept);
+  background: rgba(0, 102, 0, 0.1);
+}
+
+@keyframes scan-line {
+  0% { box-shadow: inset 0 0 0 0 rgba(0, 0, 0, 0.3); }
+  50% { box-shadow: inset 0 200px 0 0 rgba(0, 0, 0, 0.1); }
+  100% { box-shadow: inset 0 0 0 0 rgba(0, 0, 0, 0.3); }
+}
+
+/* Fill percentage warning */
+.fill-warning {
+  color: var(--scantron-red-reject);
+  font-size: 11px;
+  font-style: italic;
+  margin-top: 8px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Input - Answer input field */
+.win98-input.scantron-theme {
+  background: white;
+  border: 2px solid var(--scantron-bubble-border);
+  color: var(--scantron-text);
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  padding: 10px;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.win98-input.scantron-theme:focus {
+  outline: none;
+  border-color: var(--scantron-instruction-blue);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.2), 0 0 5px rgba(0, 102, 204, 0.3);
+}
+
+.win98-input.scantron-theme::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Pencil cursor for inputs */
+.scantron-theme input,
+.scantron-theme textarea,
+.scantron-bubble {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><circle cx="10" cy="10" r="2" fill="black"/></svg>'), crosshair;
+}
+
+/* Buttons - Submit/Action buttons */
+.win98-button.scantron-theme {
+  background: linear-gradient(180deg, #F0F0F0 0%, #D0D0D0 100%);
+  border: 2px solid var(--scantron-bubble-border);
+  color: var(--scantron-text);
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  cursor: pointer;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+}
+
+.win98-button.scantron-theme:hover {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E0E0E0 100%);
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.win98-button.scantron-theme:active {
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateY(1px);
+}
+
+.win98-button.scantron-theme:disabled {
+  background: #E0E0E0;
+  color: #999;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Separator - Section divider */
+.separator.scantron-theme {
+  height: 2px;
+  background: var(--scantron-lines);
+  border: none;
+  margin: 20px 0;
+}
+
+/* Status Bar */
+.status-bar.scantron-theme {
+  background: var(--scantron-instruction-blue);
+  border-top: 3px double var(--scantron-bubble-border);
+  color: white;
+  font-family: 'Arial', sans-serif;
+  font-size: 11px;
+  padding: 8px 15px;
+  margin: 30px -40px -30px -40px;
+}
+
+.status-bar-field.scantron-theme {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px 10px;
+  color: white;
+}
+
+/* Loading/Scanning indicator */
+.loading.scantron-theme {
+  color: var(--scantron-red-reject);
+  font-weight: bold;
+  animation: scanning 1.5s infinite;
+}
+
+@keyframes scanning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Empty state */
+.empty-state.scantron-theme {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--scantron-instruction-blue);
+  font-family: 'Arial', sans-serif;
+  line-height: 2;
+}
+
+.empty-state.scantron-theme strong {
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.empty-state.scantron-theme small {
+  color: #666;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+}
+
+/* Test ID section */
+.test-id {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 5px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 2px solid var(--scantron-bubble-border);
+  margin-bottom: 20px;
+}
+
+.test-id-digit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.test-id-digit span {
+  font-size: 10px;
+  margin-bottom: 3px;
+  font-weight: bold;
+}
+
+.test-id-bubble {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--scantron-bubble-border);
+  border-radius: 50%;
+  background: white;
+  margin: 2px 0;
+}
+
+/* Warning notices */
+.scantron-warning {
+  background: var(--scantron-warning);
+  color: white;
+  padding: 10px;
+  margin: 10px 0;
+  border: 2px solid darkorange;
+  font-weight: bold;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  font-size: 12px;
+}
+
+/* Theme transition */
+.window,
+.window-body {
+  transition: all 0.5s ease;
+}
