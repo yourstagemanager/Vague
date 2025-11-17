@@ -6,12 +6,12 @@
 // AI Provider configuration
 const AI_CONFIG = {
   // Provider: 'gemini' or 'ollama' or 'none'
-  // TEMPORARY HARDCODED VALUES FOR TESTING - env vars not loading
-  provider: import.meta.env.VITE_AI_PROVIDER || 'gemini',
+  // FULLY HARDCODED FOR TESTING - browser caching issue
+  provider: 'gemini',
 
   // Gemini settings
-  geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyCnmRrlN3RZqYn_lDKncFOobnLPB4aErdM',
-  geminiModel: import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.0-flash-exp', // or 'gemini-1.5-flash'
+  geminiApiKey: 'AIzaSyCnmRrlN3RZqYn_lDKncFOobnLPB4aErdM',
+  geminiModel: 'gemini-2.0-flash-exp', // or 'gemini-1.5-flash'
 
   // Ollama settings
   ollamaUrl: import.meta.env.VITE_OLLAMA_URL || 'http://localhost:11434',
