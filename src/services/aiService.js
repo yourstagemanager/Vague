@@ -1,95 +1,84 @@
 /**
  * AI Service Layer
- * Supports both Google Gemini API and local Ollama
+ * Using official @google/generative-ai SDK
  */
+
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // AI Provider configuration
 const AI_CONFIG = {
   // Provider: 'gemini' or 'ollama' or 'none'
-  // FULLY HARDCODED FOR TESTING - browser caching issue
   provider: 'gemini',
 
-  // Gemini settings
+  // Gemini settings - TEMPORARY hardcoded, will add proper env support
   geminiApiKey: 'AIzaSyCnmRrlN3RZqYn_lDKncFOobnLPB4aErdM',
-  geminiModel: 'gemini-2.0-flash-exp', // or 'gemini-1.5-flash'
+  geminiModel: 'gemini-2.0-flash-exp',
 
-  // Ollama settings
-  ollamaUrl: import.meta.env.VITE_OLLAMA_URL || 'http://localhost:11434',
-  ollamaModel: import.meta.env.VITE_OLLAMA_MODEL || 'llama3.2:3b', // or 'mistral', 'phi3'
+  // Ollama settings (for future use)
+  ollamaUrl: 'http://localhost:11434',
+  ollamaModel: 'llama3.2:3b',
 
   // Fallback to canned responses if AI fails
   useFallback: true,
 
-  // Temperature (creativity) - 0.0 to 1.0
+  // Generation parameters
   temperature: 0.9,
-
-  // Max tokens (response length)
   maxTokens: 200
 };
 
-// Debug logging - remove in production
-console.log('🤖🤖🤖 VERSION 2025-11-17-22:06 🤖🤖🤖');
-console.log('🤖 AI_CONFIG OBJECT:', AI_CONFIG);
-console.log('🤖 AI Service Configuration:', {
-  provider: AI_CONFIG.provider,
-  hasGeminiKey: !!AI_CONFIG.geminiApiKey,
-  geminiKeyLength: AI_CONFIG.geminiApiKey?.length || 0,
-  geminiModel: AI_CONFIG.geminiModel,
-  ollamaUrl: AI_CONFIG.ollamaUrl,
-  ollamaModel: AI_CONFIG.ollamaModel
-});
+// Initialize Google Generative AI
+let genAI = null;
+let model = null;
+
+if (AI_CONFIG.provider === 'gemini' && AI_CONFIG.geminiApiKey) {
+  try {
+    genAI = new GoogleGenerativeAI(AI_CONFIG.geminiApiKey);
+    model = genAI.getGenerativeModel({
+      model: AI_CONFIG.geminiModel,
+      generationConfig: {
+        temperature: AI_CONFIG.temperature,
+        maxOutputTokens: AI_CONFIG.maxTokens,
+      }
+    });
+    console.log('✅ Google Generative AI initialized successfully!');
+    console.log('🤖 Model:', AI_CONFIG.geminiModel);
+    console.log('🤖 API Key:', AI_CONFIG.geminiApiKey.substring(0, 10) + '...');
+  } catch (error) {
+    console.error('❌ Failed to initialize Google Generative AI:', error);
+  }
+} else {
+  console.warn('⚠️ Gemini not configured - AI provider:', AI_CONFIG.provider);
+}
 
 /**
- * Call Google Gemini API
+ * Call Google Gemini API using official SDK
  */
 async function callGemini(systemPrompt, userMessage) {
-  if (!AI_CONFIG.geminiApiKey) {
-    throw new Error('Gemini API key not configured');
+  if (!model) {
+    throw new Error('Gemini model not initialized');
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${AI_CONFIG.geminiModel}:generateContent?key=${AI_CONFIG.geminiApiKey}`;
-
-  const requestBody = {
-    contents: [{
-      parts: [{
-        text: `${systemPrompt}\n\nUser: ${userMessage}\n\nAssistant:`
-      }]
-    }],
-    generationConfig: {
-      temperature: AI_CONFIG.temperature,
-      maxOutputTokens: AI_CONFIG.maxTokens,
-    }
-  };
-
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody)
-    });
+    // Combine system prompt and user message
+    const fullPrompt = `${systemPrompt}\n\nUser: ${userMessage}\n\nAssistant:`;
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
-    }
+    console.log('🤖 Calling Gemini with prompt length:', fullPrompt.length);
 
-    const data = await response.json();
+    const result = await model.generateContent(fullPrompt);
+    const response = await result.response;
+    const text = response.text();
 
-    if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-      throw new Error('Invalid response format from Gemini');
-    }
+    console.log('✅ Gemini response received:', text.substring(0, 100) + '...');
 
-    return data.candidates[0].content.parts[0].text.trim();
+    return text.trim();
   } catch (error) {
-    console.error('Gemini API call failed:', error);
+    console.error('❌ Gemini API call failed:', error);
     throw error;
   }
 }
 
 /**
- * Call local Ollama
+ * Call local Ollama (unchanged)
  */
 async function callOllama(systemPrompt, userMessage) {
   const url = `${AI_CONFIG.ollamaUrl}/api/generate`;
@@ -136,6 +125,7 @@ async function callOllama(systemPrompt, userMessage) {
 export async function getAIResponse(systemPrompt, userMessage) {
   console.log('🤖 getAIResponse called:', {
     provider: AI_CONFIG.provider,
+    modelInitialized: !!model,
     userMessageLength: userMessage?.length,
     systemPromptLength: systemPrompt?.length
   });
@@ -143,21 +133,19 @@ export async function getAIResponse(systemPrompt, userMessage) {
   try {
     switch (AI_CONFIG.provider) {
       case 'gemini':
-        console.log('🤖 Calling Gemini API...');
+        console.log('🤖 Using Gemini API...');
         const geminiResponse = await callGemini(systemPrompt, userMessage);
-        console.log('🤖 Gemini response received:', geminiResponse?.substring(0, 100) + '...');
         return geminiResponse;
 
       case 'ollama':
-        console.log('🤖 Calling Ollama API...');
+        console.log('🤖 Using Ollama API...');
         const ollamaResponse = await callOllama(systemPrompt, userMessage);
-        console.log('🤖 Ollama response received:', ollamaResponse?.substring(0, 100) + '...');
         return ollamaResponse;
 
       case 'none':
       default:
         console.log('🤖 AI provider is "none", returning null (will use canned responses)');
-        return null; // Use canned responses
+        return null;
     }
   } catch (error) {
     console.error('🤖 AI call failed:', error);
@@ -176,9 +164,9 @@ export async function getAIResponse(systemPrompt, userMessage) {
  */
 export function isAIAvailable() {
   if (AI_CONFIG.provider === 'gemini') {
-    return !!AI_CONFIG.geminiApiKey;
+    return !!model;
   } else if (AI_CONFIG.provider === 'ollama') {
-    return true; // Assume available, will fail gracefully
+    return true;
   }
   return false;
 }
@@ -190,6 +178,7 @@ export function getAIProviderInfo() {
   return {
     provider: AI_CONFIG.provider,
     model: AI_CONFIG.provider === 'gemini' ? AI_CONFIG.geminiModel : AI_CONFIG.ollamaModel,
-    available: isAIAvailable()
+    available: isAIAvailable(),
+    initialized: !!model
   };
 }
